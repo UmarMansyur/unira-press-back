@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  thumbnail String?  @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admin")
+}
+
+model ReaderCategory {
+  id         Int          @id @default(autoincrement())
+  name       String
+  Submission Submission[]
+
+  @@map("kategori_pembaca")
+}
+
+model ReferenceType {
+  id         Int          @id @default(autoincrement())
+  name       String
+  Submission Submission[]
+
+  @@map("jenis_pustaka")
+}
+
+model TypeCategory {
+  id         Int          @id @default(autoincrement())
+  name       String
+  Submission Submission[]
+
+  @@map("kategori_jenis")
+}
+
+model Publication {
+  id         Int          @id @default(autoincrement())
+  name       String
+  Submission Submission[]
+
+  @@map("terbitan")
+}
+
+model Media {
+  id         Int          @id @default(autoincrement())
+  name       String
+  Submission Submission[]
+
+  @@map("media")
+}
+
+model Submission {
+  id              Int            @id @default(autoincrement())
+  nomor_induk     String         @db.VarChar(25)
+  title           String         @db.VarChar(255)
+  author          String         @db.VarChar(255)
+  sinopsis        String         @db.Text
+  distribution    String         @db.Text
+  link            String         @db.VarChar(255)
+  edition         String         @db.VarChar(255)
+  series          String         @db.VarChar(255)
+  publish_year    String         @db.VarChar(255)
+  page_count      String         @db.VarChar(20)
+  height          String         @db.VarChar(20)
+  status_publish  String         @db.VarChar(100)
+  category_reader ReaderCategory @relation(fields: [readerCategoryId], references: [id], onDelete: Cascade)
+  type_reference  ReferenceType  @relation(fields: [referenceTypeId], references: [id], onDelete: Cascade)
+  category_type   TypeCategory   @relation(fields: [typeCategoryId], references: [id], onDelete: Cascade)
+  publication     Publication    @relation(fields: [publicationId], references: [id], onDelete: Cascade)
+  media           Media          @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  publish_date    DateTime?      @db.DateTime
+
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  readerCategoryId Int
+  referenceTypeId  Int
+  typeCategoryId   Int
+  publicationId    Int
+  mediaId          Int
+  FileRevisi       FileRevisi[]
+  Comment          Comment[]
+
+  @@map("pengajuan")
+}
+
+model FileRevisi {
+  id           Int        @id @default(autoincrement())
+  file         String     @db.VarChar(255)
+  pengajuan    Submission @relation(fields: [pengajuan_id], references: [id], onDelete: Cascade)
+  pengajuan_id Int
+
+  @@map("file_revisi")
+}
+
+model Comment {
+  id           Int        @id @default(autoincrement())
+  nomor_induk  String     @db.VarChar(25)
+  isClient     Boolean
+  comment      String     @db.Text
+  pengajuan    Submission @relation(fields: [pengajuan_id], references: [id], onDelete: Cascade)
+  pengajuan_id Int
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("komentar")
+}

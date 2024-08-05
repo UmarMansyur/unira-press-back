@@ -17,7 +17,7 @@ class FileRevisi {
                 where: {
                     id: Number(req.params.id)
                 }
-            })
+            });
         } catch (e) {
             throw e;
         }
@@ -30,7 +30,7 @@ class FileRevisi {
                 where: {
                     pengajuan_id: Number(pengajuan_id)
                 }
-            })
+            });
 
         } catch (e) {
             throw e;
@@ -38,39 +38,38 @@ class FileRevisi {
     }
 
     async create(req) {
-        try {
-            return await this.prisma.fileRevisi.create({
-                data: {
-                    ...req.body,
-                }
-            })
-        } catch (e) {
-            throw e;
-        }
+        return await this.prisma.fileRevisi.create({
+            data: {
+                file: req.file.filename,
+                size: Number(req.file.size),
+                name: req.file.originalname,
+                pengajuan_id: Number(req.body.pengajuan_id)
+            }
+        });
     }
 
     async update(req) {
-        try {
-            const exist = await this.findOne(req);
-            if (!exist) {
-                return errorHandler.notFound('Data not found');
-            }
-            return await this.prisma.fileRevisi.update({
-                where: {
-                    id: Number(req.params.id),
-                },
-                data: {
-                    ...req.body,
-                }
-            })
-        } catch (e) {
-            throw e;
+        const exist = await this.findOne(req);
+        if (!exist) {
+            return errorHandler.notFound('Data not found');
         }
+        this.deleteFile(exist.file);
+        return await this.prisma.fileRevisi.update({
+            where: {
+                id: Number(req.params.id),
+            },
+            data: {
+                file: req.file.filename,
+                size: Number(req.file.size),
+                name: req.file.originalname,
+            }
+        });
+
     }
 
     deleteFile(file) {
-        if (fs.existsSync(path.join(__dirname, '../../uploads/' + file))) {
-            fs.unlinkSync(path.join(__dirname, '../../uploads/' + file));
+        if (fs.existsSync(path.join(__dirname, '../uploads/' + file))) {
+            fs.unlinkSync(path.join(__dirname, '../uploads/' + file));
         }
     }
 
@@ -93,7 +92,7 @@ class FileRevisi {
                 data: {
                     file: req.file.fileName,
                 }
-            })
+            });
         } catch (e) {
             throw e;
         }
@@ -105,11 +104,12 @@ class FileRevisi {
             if (!exist) {
                 return errorHandler.notFound('Data not found');
             }
+            this.deleteFile(exist.file);
             return await this.prisma.fileRevisi.delete({
                 where: {
                     id: Number(req.params.id),
                 }
-            })
+            });
         } catch (e) {
             throw e;
         }

@@ -10,20 +10,24 @@ class PengajuanService {
 
     async findOne(req) {
         try {
-            return await this.prisma.submission.findUnique({
+            const result = await this.prisma.submission.findUnique({
                 include: {
-                    media: true,
                     category_reader: true,
                     category_type: true,
-                    publication: true,
                     type_reference: true,
                     FileRevisi: true,
-                    Comment: true
+                    Comment: true,
+                    media: true,
                 },
                 where: {
                     id: Number(req.params.id)
                 }
-            })
+            });
+            if(!result) {
+                return errorHandler.notFound('Data not found');
+            }
+            result.cover = result.cover ? process.env.BASE_URL + '/uploads/' + result.cover : null;
+            return result;
         } catch (e) {
             throw e;
         }
@@ -32,12 +36,12 @@ class PengajuanService {
     async findAll(req) {
         try {
 
-            const {page = 1, limit = 10, search = ""} = req.query;
+            const { page = 1, limit = 10, search = "" } = req.query;
             const offset = page * limit - limit;
 
             const where = {};
 
-            const {role} = req.user;
+            const { role } = req.user;
 
             if (role === 'client') {
                 where.nomor_induk = req.user.id;
@@ -46,22 +50,13 @@ class PengajuanService {
             if (search !== "") {
                 where.nomor_induk = {
                     contains: search
-                }
+                };
             }
 
 
             const data = await this.prisma.submission.findMany({
-                skip: offset,
-                take: limit,
-                include: {
-                    media: true,
-                    category_reader: true,
-                    category_type: true,
-                    publication: true,
-                    type_reference: true,
-                    FileRevisi: true,
-                    Comment: true
-                },
+                skip: Number(offset),
+                take: Number(limit),
                 where
             });
             const total = await this.prisma.submission.count({
@@ -73,26 +68,26 @@ class PengajuanService {
                 total,
                 total_page: Math.ceil(total / limit),
                 current_page: page,
-            }
+            };
         } catch (e) {
             throw e;
         }
     }
 
     async create(req) {
-            const file = req.file ? req.file.fileName : null;
-            if (file) {
-                req.body.file = file;
+        const file = req.file ? req.file.fileName : null;
+        if (file) {
+            req.body.file = file;
+        }
+        req.body.readerCategoryId = Number(req.body.readerCategoryId);
+        req.body.referenceTypeId = Number(req.body.referenceTypeId);
+        req.body.typeCategoryId = Number(req.body.typeCategoryId);
+        req.body.mediaId = Number(req.body.mediaId);
+        return await this.prisma.submission.create({
+            data: {
+                ...req.body,
             }
-            req.body.readerCategoryId = Number(req.body.readerCategoryId);
-            req.body.referenceTypeId = Number(req.body.referenceTypeId);
-            req.body.typeCategoryId = Number(req.body.typeCategoryId);
-            req.body.publicationId = Number(req.body.publicationId);
-            return await this.prisma.submission.create({
-                data: {
-                    ...req.body,
-                }
-            })
+        });
     }
 
     async update(req) {
@@ -112,42 +107,38 @@ class PengajuanService {
                 data: {
                     ...req.body,
                 }
-            })
+            });
         } catch (e) {
             throw e;
         }
     }
 
     deleteFile(file) {
-        if (fs.existsSync(path.join(__dirname, '../../uploads/' + file))) {
-            fs.unlinkSync(path.join(__dirname, '../../uploads/' + file));
+        if (fs.existsSync(path.join(__dirname, '../uploads/' + file))) {
+            fs.unlinkSync(path.join(__dirname, '../uploads/' + file));
         }
     }
 
-    async uploadFile(req) {
-        try {
-            const exist = await this.findOne(req);
-            if (!exist) {
-                return errorHandler.notFound('Data not found');
-            }
-
-            if (exist.file) {
-                this.deleteFile(exist.file);
-            }
-
-
-            return await this.prisma.submission.update({
-                where: {
-                    id: Number(req.params.id),
-                },
-                data: {
-                    file: req.file.fileName,
-                }
-            })
-        } catch (e) {
-            throw e;
+    async cover(req) {
+        const file = req.file ? req.file.fileName : null;
+        if (file) {
+            req.body.cover = file;
         }
+        const exist = await this.findOne(req);
+        if (exist.cover) {
+            this.deleteFile(exist.cover);
+        }
+        await this.prisma.submission.update({
+            where: {
+                id: Number(req.params.id),
+            },
+            data: {
+                cover: req.file.filename,
+            }
+        });
     }
+
+
 
     async delete(req) {
         try {
@@ -159,7 +150,7 @@ class PengajuanService {
                 where: {
                     id: Number(req.params.id),
                 }
-            })
+            });
         } catch (e) {
             throw e;
         }

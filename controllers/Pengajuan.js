@@ -11,47 +11,59 @@ const create = async (req, res, next) => {
     }
 }
 
-const update = async (req, res) => {
+const cover = async (req, res, next) => {
+    try {
+        const result = await pengajuanService.cover(req);
+        res.status(201).json({
+            data: result
+        });
+    } catch (e) {
+        next(e);
+    }
+}
+
+const update = async (req, res, next) => {
     try {
         const result = await pengajuanService.update(req);
         res.status(200).json({
             data: result
         });
     } catch (e) {
-        res.status(400).json(e);
+        next(e)
     }
 }
 
-const destroy = async (req, res) => {
+const destroy = async (req, res, next) => {
     try {
         const result = await pengajuanService.delete(req);
         res.status(200).json({
             data: result
         });
     } catch (e) {
-        res.status(400).json(e);
+        next(e)
     }
 }
 
-const getAll = async (req, res) => {
+const getAll = async (req, res, next) => {
     try {
         const result = await pengajuanService.findAll(req);
         res.status(200).json({
             data: result
         });
     } catch (e) {
-        res.status(400).json(e);
+        next(e)
     }
 }
 
-const uploadFile = async (req, res) => {
+
+const getOne = async (req, res, next) => {
     try {
-        const result = await pengajuanService.uploadFile(req);
+        const result = await pengajuanService.findOne(req);
         res.status(200).json({
             data: result
         });
     } catch (e) {
-        res.status(400).json(e);
+        next(e)
     }
 }
 
@@ -59,5 +71,7 @@ module.exports = {
     create,
     update,
     destroy,
-    uploadFile
+    cover,
+    getAll,
+    getOne
 }

@@ -6,7 +6,7 @@ const getAll = async (req, res, next) => {
       kategori_pembaca: await prisma.readerCategory.findMany(),
       jenis_pustaka: await prisma.referenceType.findMany(),
       kategori_jenis: await prisma.typeCategory.findMany(),
-      terbitan: await prisma.publication.findMany()
+      media: await prisma.media.findMany()
     }
     res.json(data);
   } catch (error) {

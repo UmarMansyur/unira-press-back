@@ -51,26 +51,24 @@ async function main() {
         },
       ]
     });
-
-    await tx.publication.createMany({
+    
+    await tx.media.createMany({
       data: [
         {
-          name: 'Pemerintah'
+          name: 'Buku'
         },
         {
-          name: 'Perguruan Tinggi'
+          name: 'Pdf'
         },
         {
-          name: 'Swasta'
+          name: 'Epub'
         },
         {
-          name: 'Penelitian'
-        },
-        {
-          name: 'Non Penelitian'
+          name: 'Audio Book'
         }
       ]
-    })
+    });
+
   });
 }
 

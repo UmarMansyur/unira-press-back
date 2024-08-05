@@ -13,6 +13,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Media {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Submission Submission[]
+
+  @@map("media")
+}
+
 model Admin {
   id        Int      @id @default(autoincrement())
   email     String   @unique
@@ -49,41 +60,34 @@ model TypeCategory {
   @@map("kategori_jenis")
 }
 
-model Publication {
-  id         Int          @id @default(autoincrement())
-  name       String
-  Submission Submission[]
-
-  @@map("terbitan")
-}
-
-
 model Submission {
-  id              Int            @id @default(autoincrement())
-  nomor_induk     String         @db.VarChar(25)
-  title           String         @db.VarChar(255)
-  author          String         @db.VarChar(255)
-  sinopsis        String         @db.Text
-  distribution    String         @db.Text
-  link            String         @db.VarChar(255)
-  edition         String         @db.VarChar(255)
-  series          String         @db.VarChar(255)
-  publish_year    String         @db.VarChar(255)
-  page_count      String         @db.VarChar(20)
-  height          String         @db.VarChar(20)
-  status_publish  String         @db.VarChar(100)
-  category_reader ReaderCategory @relation(fields: [readerCategoryId], references: [id], onDelete: Cascade)
-  type_reference  ReferenceType  @relation(fields: [referenceTypeId], references: [id], onDelete: Cascade)
-  category_type   TypeCategory   @relation(fields: [typeCategoryId], references: [id], onDelete: Cascade)
-  publication     Publication    @relation(fields: [publicationId], references: [id], onDelete: Cascade)
-  publish_date    DateTime?      @db.DateTime
-
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
+  id               Int            @id @default(autoincrement())
+  nomor_induk      String         @db.VarChar(25)
+  title            String         @db.VarChar(255)
+  author           String         @db.VarChar(255)
+  sinopsis         String         @db.Text
+  distribution     String         @db.Text
+  link             String?        @db.VarChar(255)
+  edition          String         @db.VarChar(255)
+  series           String         @db.VarChar(255)
+  publish_year     String         @db.VarChar(255)
+  page_count       String         @db.VarChar(20)
+  height           String         @db.VarChar(20)
+  width            String         @db.VarChar(20)
+  weight           String         @db.VarChar(20)
+  status_publish   String         @db.VarChar(100)
+  category_reader  ReaderCategory @relation(fields: [readerCategoryId], references: [id], onDelete: Cascade)
+  type_reference   ReferenceType  @relation(fields: [referenceTypeId], references: [id], onDelete: Cascade)
+  category_type    TypeCategory   @relation(fields: [typeCategoryId], references: [id], onDelete: Cascade)
+  publish_date     DateTime?      @db.DateTime
+  cover            String?        @db.VarChar(255)
+  media            Media          @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  mediaId          Int
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
   readerCategoryId Int
   referenceTypeId  Int
   typeCategoryId   Int
-  publicationId    Int
   FileRevisi       FileRevisi[]
   Comment          Comment[]
 
@@ -93,6 +97,8 @@ model Submission {
 model FileRevisi {
   id           Int        @id @default(autoincrement())
   file         String     @db.VarChar(255)
+  size         Float      @db.Double
+  name         String     @db.VarChar(255)
   pengajuan    Submission @relation(fields: [pengajuan_id], references: [id], onDelete: Cascade)
   pengajuan_id Int
 

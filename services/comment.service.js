@@ -17,7 +17,7 @@ class CommentService {
                 where: {
                     id: Number(req.params.id)
                 }
-            })
+            });
         } catch (e) {
             throw e;
         }
@@ -30,7 +30,7 @@ class CommentService {
                 where: {
                     pengajuan_id: Number(pengajuan_id)
                 }
-            })
+            });
         } catch (e) {
             throw e;
         }
@@ -38,46 +38,33 @@ class CommentService {
 
     async create(req) {
         try {
-            const file = req.file ? req.file.fileName : null;
-            if (file) {
-                req.body.file = file;
-            }
+            console.log(req.body);
             return await this.prisma.comment.create({
                 data: {
                     ...req.body,
                 }
-            })
+            });
         } catch (e) {
             throw e;
         }
     }
 
     async update(req) {
-        try {
-            const exist = await this.findOne(req);
-            if (!exist) {
-                return errorHandler.notFound('Data not found');
+
+        return await this.prisma.comment.update({
+            where: {
+                id: Number(req.params.id),
+            },
+            data: {
+                ...req.body,
             }
-            if (req.file) {
-                this.deleteFile(exist.file);
-                req.body.file = req.file.fileName;
-            }
-            return await this.prisma.comment.update({
-                where: {
-                    id: Number(req.params.id),
-                },
-                data: {
-                    ...req.body,
-                }
-            })
-        } catch (e) {
-            throw e;
-        }
+        });
+
     }
 
     deleteFile(file) {
-        if (fs.existsSync(path.join(__dirname, '../../uploads/' + file))) {
-            fs.unlinkSync(path.join(__dirname, '../../uploads/' + file));
+        if (fs.existsSync(path.join(__dirname, '../uploads/' + file))) {
+            fs.unlinkSync(path.join(__dirname, '../uploads/' + file));
         }
     }
 
@@ -100,7 +87,7 @@ class CommentService {
                 data: {
                     file: req.file.fileName,
                 }
-            })
+            });
         } catch (e) {
             throw e;
         }
@@ -116,7 +103,7 @@ class CommentService {
                 where: {
                     id: Number(req.params.id),
                 }
-            })
+            });
         } catch (e) {
             throw e;
         }

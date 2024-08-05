@@ -80,19 +80,19 @@ class PengajuanService {
     }
 
     async create(req) {
-        try {
             const file = req.file ? req.file.fileName : null;
             if (file) {
                 req.body.file = file;
             }
+            req.body.readerCategoryId = Number(req.body.readerCategoryId);
+            req.body.referenceTypeId = Number(req.body.referenceTypeId);
+            req.body.typeCategoryId = Number(req.body.typeCategoryId);
+            req.body.publicationId = Number(req.body.publicationId);
             return await this.prisma.submission.create({
                 data: {
                     ...req.body,
                 }
             })
-        } catch (e) {
-            throw e;
-        }
     }
 
     async update(req) {

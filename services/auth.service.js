@@ -1,8 +1,7 @@
-const {response} = require("../app");
 const prisma = require("../utils/client");
 const errorHandler = require('../utils/error');
-const {validatePassword, generatePassword} = require("../utils/checker");
-const {generateToken, refreshToken} = require("../utils/token");
+const { validatePassword, generatePassword } = require("../utils/checker");
+const { generateToken, refreshToken } = require("../utils/token");
 const jwt = require('jsonwebtoken');
 
 class AuthService {
@@ -24,49 +23,45 @@ class AuthService {
             const payload = {
                 id: data.data.id,
                 username: data.data.attributes.nama,
-                thumbnail: data.data.attributes.thumbnail,
+                thumbnail: 'https://api.unira.ac.id/' + data.data.attributes.thumbnail,
                 email: data.data.attributes.email,
                 role: 'client'
-            }
+            };
             return {
                 access: generateToken(payload),
                 refresh: refreshToken(payload)
-            }
+            };
         } catch (e) {
 
         }
     }
 
     async loginSimat(req) {
-        try {
-            const {username, password} = req.body;
-            const formData = new FormData();
-            formData.append('username', username);
-            formData.append('password', password);
-            const result = await fetch('https://api.unira.ac.id/v1/token', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await result.json();
+        const { username, password } = req.body;
+        const formData = new FormData();
+        formData.append('username', username);
+        formData.append('password', password);
+        const result = await fetch('https://api.unira.ac.id/v1/token', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await result.json();
 
-            if (!result.ok) {
-                return errorHandler.unAuthorized(data.message);
-            }
-            return this.getSaya(data.data.attributes.access);
-        } catch (error) {
-            throw error;
+        if (!result.ok) {
+            return errorHandler.unAuthorized(data.message);
         }
+        return this.getSaya(data.data.attributes.access);
     }
 
     async login(req) {
         try {
-            const {username, password} = req.body;
+            const { username, password } = req.body;
 
             const user = await this.prisma.admin.findUnique({
                 where: {
                     username: username
                 }
-            })
+            });
 
             if (!user) {
                 return errorHandler.unAuthorized('Invalid username or password');
@@ -79,17 +74,17 @@ class AuthService {
             }
 
             const payload = {
-                id: user.id,
+                id: user.username,
                 username: user.username,
                 thumbnail: user.thumbnail,
                 email: user.email,
                 role: 'admin'
-            }
+            };
 
             return {
                 access: generateToken(payload),
                 refresh: refreshToken(payload)
-            }
+            };
         } catch (error) {
             throw error;
         }
@@ -97,7 +92,7 @@ class AuthService {
 
     async register(req) {
         try {
-            const {username, password, email} = req.body;
+            const { username, password, email } = req.body;
 
             return await this.prisma.admin.create({
                 data: {
@@ -114,7 +109,7 @@ class AuthService {
 
     async refreshToken(req) {
         try {
-            const {refresh_token} = req.body;
+            const { refresh_token } = req.body;
             const valid = jwt.verify(refresh_token, process.env.JWT_SECRET_REFRESH);
             if (!valid) {
                 return errorHandler.unAuthorized('Invalid refresh token');
@@ -125,11 +120,11 @@ class AuthService {
                 thumbnail: valid.thumbnail,
                 email: valid.email,
                 role: valid.role
-            }
+            };
             return {
                 access: generateToken(payload),
                 refresh: refreshToken(payload)
-            }
+            };
         } catch (error) {
             throw error;
         }

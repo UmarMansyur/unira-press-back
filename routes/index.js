@@ -20,4 +20,5 @@ router.use('/auth', authenticationRouter);
 router.use('/comment', commentRouter);
 router.use('/filerevisi', fileRevisiRouter);
 router.use('/pengajuan', pengajuanRouter);
+router.use('/resource', require('./resource'));
 module.exports = router;

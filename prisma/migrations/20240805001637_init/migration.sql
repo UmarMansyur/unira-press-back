@@ -2,12 +2,14 @@
 CREATE TABLE `admin` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `email` VARCHAR(191) NOT NULL,
+    `username` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
     `thumbnail` VARCHAR(255) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `admin_email_key`(`email`),
+    UNIQUE INDEX `admin_username_key`(`username`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -44,34 +46,49 @@ CREATE TABLE `terbitan` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `media` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(191) NOT NULL,
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `pengajuan` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `title` VARCHAR(191) NOT NULL,
-    `author` VARCHAR(191) NOT NULL,
-    `sinopsis` VARCHAR(191) NOT NULL,
-    `distribution` VARCHAR(191) NOT NULL,
-    `link` VARCHAR(191) NOT NULL,
-    `edition` VARCHAR(191) NOT NULL,
-    `series` VARCHAR(191) NOT NULL,
-    `publish_year` VARCHAR(191) NOT NULL,
-    `page_count` VARCHAR(191) NOT NULL,
-    `height` VARCHAR(191) NOT NULL,
-    `status_publish` VARCHAR(191) NOT NULL,
+    `nomor_induk` VARCHAR(25) NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `author` VARCHAR(255) NOT NULL,
+    `sinopsis` TEXT NOT NULL,
+    `distribution` TEXT NOT NULL,
+    `link` VARCHAR(255) NOT NULL,
+    `edition` VARCHAR(255) NOT NULL,
+    `series` VARCHAR(255) NOT NULL,
+    `publish_year` VARCHAR(255) NOT NULL,
+    `page_count` VARCHAR(20) NOT NULL,
+    `height` VARCHAR(20) NOT NULL,
+    `status_publish` VARCHAR(100) NOT NULL,
+    `publish_date` DATETIME NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `readerCategoryId` INTEGER NOT NULL,
     `referenceTypeId` INTEGER NOT NULL,
     `typeCategoryId` INTEGER NOT NULL,
     `publicationId` INTEGER NOT NULL,
-    `mediaId` INTEGER NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `file_revisi` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `file` VARCHAR(255) NOT NULL,
+    `pengajuan_id` INTEGER NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `komentar` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `nomor_induk` VARCHAR(25) NOT NULL,
+    `isClient` BOOLEAN NOT NULL,
+    `comment` TEXT NOT NULL,
+    `pengajuan_id` INTEGER NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -89,4 +106,7 @@ ALTER TABLE `pengajuan` ADD CONSTRAINT `pengajuan_typeCategoryId_fkey` FOREIGN K
 ALTER TABLE `pengajuan` ADD CONSTRAINT `pengajuan_publicationId_fkey` FOREIGN KEY (`publicationId`) REFERENCES `terbitan`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `pengajuan` ADD CONSTRAINT `pengajuan_mediaId_fkey` FOREIGN KEY (`mediaId`) REFERENCES `media`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `file_revisi` ADD CONSTRAINT `file_revisi_pengajuan_id_fkey` FOREIGN KEY (`pengajuan_id`) REFERENCES `pengajuan`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `komentar` ADD CONSTRAINT `komentar_pengajuan_id_fkey` FOREIGN KEY (`pengajuan_id`) REFERENCES `pengajuan`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

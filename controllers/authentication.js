@@ -3,7 +3,7 @@ const authService = require('../services/auth.service')
 
 const login = async (req, res, next) => {
   try {
-    if(req.body.client === "simat") {
+    if(req.body.client === "client") {
       const data = await authService.loginSimat(req);
       return res.status(200).json({
         data: data

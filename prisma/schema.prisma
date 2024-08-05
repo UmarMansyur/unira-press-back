@@ -57,13 +57,6 @@ model Publication {
   @@map("terbitan")
 }
 
-model Media {
-  id         Int          @id @default(autoincrement())
-  name       String
-  Submission Submission[]
-
-  @@map("media")
-}
 
 model Submission {
   id              Int            @id @default(autoincrement())
@@ -83,7 +76,6 @@ model Submission {
   type_reference  ReferenceType  @relation(fields: [referenceTypeId], references: [id], onDelete: Cascade)
   category_type   TypeCategory   @relation(fields: [typeCategoryId], references: [id], onDelete: Cascade)
   publication     Publication    @relation(fields: [publicationId], references: [id], onDelete: Cascade)
-  media           Media          @relation(fields: [mediaId], references: [id], onDelete: Cascade)
   publish_date    DateTime?      @db.DateTime
 
   createdAt        DateTime     @default(now())
@@ -92,7 +84,6 @@ model Submission {
   referenceTypeId  Int
   typeCategoryId   Int
   publicationId    Int
-  mediaId          Int
   FileRevisi       FileRevisi[]
   Comment          Comment[]
 

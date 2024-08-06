@@ -23,14 +23,50 @@ class PengajuanService {
                     id: Number(req.params.id)
                 }
             });
-            if(!result) {
+            if (!result) {
                 return errorHandler.notFound('Data not found');
             }
             result.cover = result.cover ? process.env.BASE_URL + '/uploads/' + result.cover : null;
+            const admin = await this.prisma.admin.findMany();
+            const thumbnailPengaju = await this.getThumbnailFromSIMATGraphQl(result.nomor_induk);
+            
+            result.Comment = result.Comment.map(item => {
+                return {
+                    ...item,
+                    nama: item.isClient === false ? admin.find(adm => adm.username === item.nomor_induk).username : thumbnailPengaju.nama,
+                    thumbnail: item.isClient === false ? admin.find(adm => adm.username === item.nomor_induk).thumbnail : thumbnailPengaju.thumbnail
+                };
+            });
             return result;
         } catch (e) {
             throw e;
         }
+    }
+
+    async getThumbnailFromSIMATGraphQl(nomor_induk) {
+        const response = await fetch("https://api.unira.ac.id/v2", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                query: `
+                query {
+                  dokar(nis: "${nomor_induk}") {
+                    nis
+                    nama
+                    email
+                    thumbnail
+        
+                  }
+                }
+              `,
+            }),
+        });
+        const data = await response.json();
+        const result = data.data.dokar ? data.data.dokar : null;
+        result.thumbnail = result.thumbnail ? 'https://api.unira.ac.id/' + result.thumbnail : null;
+        return result;
     }
 
     async findAll(req) {

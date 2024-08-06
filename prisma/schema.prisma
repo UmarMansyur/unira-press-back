@@ -76,6 +76,7 @@ model Submission {
   width            String         @db.VarChar(20)
   weight           String         @db.VarChar(20)
   status_publish   String         @db.VarChar(100)
+  view_count       Int            @default(0)
   category_reader  ReaderCategory @relation(fields: [readerCategoryId], references: [id], onDelete: Cascade)
   type_reference   ReferenceType  @relation(fields: [referenceTypeId], references: [id], onDelete: Cascade)
   category_type    TypeCategory   @relation(fields: [typeCategoryId], references: [id], onDelete: Cascade)
@@ -116,4 +117,14 @@ model Comment {
   updatedAt    DateTime   @updatedAt
 
   @@map("komentar")
+}
+
+
+model AboutMe {
+  id        Int      @id @default(autoincrement())
+  content   String @db.LongText
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tentang_kami")
 }

@@ -13,6 +13,10 @@ class ErrorHandler extends  Error {
         throw new ErrorHandler(401, message);
     }
 
+    static badRequest(message) {
+        throw new ErrorHandler(400, message);
+    }
+
     static conflictError(message) {
         throw new ErrorHandler(403, message);
     }

@@ -13,118 +13,193 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Media {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  Submission Submission[]
-
-  @@map("media")
+enum Type {
+  ADMIN
+  USER
 }
 
-model Admin {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  username  String   @unique
-  password  String
-  thumbnail String?  @db.VarChar(255)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Pengguna {
+  id                 BigInt           @id @default(autoincrement())
+  username           String           @unique @db.VarChar(200)
+  password           String           @db.VarChar(200)
+  email              String           @unique @db.VarChar(200)
+  thumbnail          String?          @db.VarChar(200)
+  type               Type             @default(USER)
+  phone              String           @unique @db.VarChar(13)
+  is_simat           Boolean          @default(false)
+  has_verified_email Boolean          @default(false)
+  created_at         DateTime         @default(now())
+  updated_at         DateTime         @updatedAt
+  UserPrivillege     UserPrivillege[]
+  News               News[]
+  Book_designer      Book[]           @relation("book_designer")
+  Book_editor        Book[]           @relation("book_editor")
+  Book_layouter      Book[]           @relation("book_layouter")
+  Book               Book[]           @relation("book_proofreader")
+  PengajuanBuku      PengajuanBuku[]
+  RevisiNaskah       RevisiNaskah[]
+  Invoice            Invoice[]
 
-  @@map("admin")
+  @@map("pengguna")
 }
 
-model ReaderCategory {
-  id         Int          @id @default(autoincrement())
-  name       String
-  Submission Submission[]
+model Role {
+  id   Int    @id @default(autoincrement())
+  name String @unique @db.VarChar(100)
 
-  @@map("kategori_pembaca")
+  created_at     DateTime         @default(now())
+  updated_at     DateTime         @updatedAt
+  UserPrivillege UserPrivillege[]
+
+  @@map("role")
 }
 
-model ReferenceType {
-  id         Int          @id @default(autoincrement())
-  name       String
-  Submission Submission[]
+model UserPrivillege {
+  id       Int      @id @default(autoincrement())
+  pengguna Pengguna @relation(fields: [user_id], references: [id])
+  user_id  BigInt
+  role     Role     @relation(fields: [role_id], references: [id])
+  role_id  Int
 
-  @@map("jenis_pustaka")
+  @@map("hak_akses_pengguna")
 }
 
-model TypeCategory {
-  id         Int          @id @default(autoincrement())
-  name       String
-  Submission Submission[]
+model News {
+  id              Int      @id @default(autoincrement())
+  judul_berita    String   @db.VarChar(200)
+  isi             String   @db.Text
+  cover           String   @db.VarChar(200)
+  dilihat         Int      @default(0)
+  penulis         Pengguna @relation(fields: [penulis_id], references: [id])
+  penulis_id      BigInt
+  tanggal_publish DateTime @default(now())
 
-  @@map("kategori_jenis")
+  @@map("news")
 }
 
-model Submission {
-  id               Int            @id @default(autoincrement())
-  nomor_induk      String         @db.VarChar(25)
-  title            String         @db.VarChar(255)
-  author           String         @db.VarChar(255)
-  sinopsis         String         @db.Text
-  distribution     String         @db.Text
-  link             String?        @db.VarChar(255)
-  edition          String         @db.VarChar(255)
-  series           String         @db.VarChar(255)
-  publish_year     String         @db.VarChar(255)
-  page_count       String         @db.VarChar(20)
-  height           String         @db.VarChar(20)
-  width            String         @db.VarChar(20)
-  weight           String         @db.VarChar(20)
-  status_publish   String         @db.VarChar(100)
-  view_count       Int            @default(0)
-  category_reader  ReaderCategory @relation(fields: [readerCategoryId], references: [id], onDelete: Cascade)
-  type_reference   ReferenceType  @relation(fields: [referenceTypeId], references: [id], onDelete: Cascade)
-  category_type    TypeCategory   @relation(fields: [typeCategoryId], references: [id], onDelete: Cascade)
-  publish_date     DateTime?      @db.DateTime
-  cover            String?        @db.VarChar(255)
-  media            Media          @relation(fields: [mediaId], references: [id], onDelete: Cascade)
-  mediaId          Int
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  readerCategoryId Int
-  referenceTypeId  Int
-  typeCategoryId   Int
-  FileRevisi       FileRevisi[]
-  Comment          Comment[]
+model BookCategory {
+  id   Int    @id @default(autoincrement())
+  name String @unique @db.VarChar(100)
 
-  @@map("pengajuan")
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  Book       Book[]
+
+  @@map("kategori_buku")
 }
 
-model FileRevisi {
-  id           Int        @id @default(autoincrement())
-  file         String     @db.VarChar(255)
-  size         Float      @db.Double
-  name         String     @db.VarChar(255)
-  pengajuan    Submission @relation(fields: [pengajuan_id], references: [id], onDelete: Cascade)
-  pengajuan_id Int
-
-  @@map("file_revisi")
+model Book {
+  id                Int                @id @default(autoincrement())
+  kategori_buku     BookCategory       @relation(fields: [kategori_buku_id], references: [id])
+  kategori_buku_id  Int
+  layouter          Pengguna           @relation("book_layouter", fields: [layouter_id], references: [id])
+  layouter_id       BigInt
+  proofreader       Pengguna           @relation("book_proofreader", fields: [proofreader_id], references: [id])
+  proofreader_id    BigInt
+  editor            Pengguna           @relation("book_editor", fields: [editor_id], references: [id])
+  editor_id         BigInt
+  desainer          Pengguna           @relation("book_designer", fields: [desainer_id], references: [id])
+  desainer_id       BigInt
+  pengarang         String             @db.VarChar(200)
+  judul             String             @db.VarChar(200)
+  sinopsis          String             @db.Text
+  file_cover        String?            @db.VarChar(200)
+  tipe_identifikasi IdentificationType
+  isbn              String?            @unique @db.VarChar(200)
+  jumlah_halaman    Int
+  ukuran            String             @db.VarChar(200)
+  tanggal_pengajuan DateTime           @default(now())
+  tanggal_publish   DateTime
+  harga             Int?
+  tipe_kepenulisan  TypeWriting
+  penanggung_jawab  String             @db.VarChar(200)
+  tahun_terbit      Int
+  dilihat           Int                @default(0)
+  PengajuanISBN     PengajuanISBN[]
+  PengajuanBuku     PengajuanBuku[]
+  FileNaskah        FileNaskah[]
+  Invoice           Invoice[]
 }
 
-model Comment {
-  id           Int        @id @default(autoincrement())
-  nomor_induk  String     @db.VarChar(25)
-  isClient     Boolean
-  comment      String     @db.Text
-  pengajuan    Submission @relation(fields: [pengajuan_id], references: [id], onDelete: Cascade)
-  pengajuan_id Int
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-
-  @@map("komentar")
+enum TypeWriting {
+  fiksi
+  non_fiksi
 }
 
+enum IdentificationType {
+  ISBN
+  QRCBN
+  hanya_cetak
+}
 
-model AboutMe {
-  id        Int      @id @default(autoincrement())
-  content   String @db.LongText
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model PengajuanISBN {
+  id      Int    @id @default(autoincrement())
+  buku    Book   @relation(fields: [buku_id], references: [id])
+  buku_id Int
+  status  Status
+}
 
-  @@map("tentang_kami")
+enum Status {
+  proses
+  permohonan_revisi
+  ditolak
+  isbn_diterbitkan
+}
+
+model PengajuanBuku {
+  id               Int             @id @default(autoincrement())
+  buku             Book            @relation(fields: [buku_id], references: [id])
+  buku_id          Int
+  pengguna         Pengguna        @relation(fields: [pengguna_id], references: [id])
+  pengguna_id      BigInt
+  status_pengajuan StatusPengajuan
+  alasan_penolakan String?         @db.Text
+  tanggal_ditolak  DateTime?
+  tanggal_diterima DateTime?
+  tanggal_revisi   DateTime?
+  tanggal_proses   DateTime?
+  tanggal_cetak    DateTime?
+  tanggal_terbit   DateTime?
+  RevisiNaskah     RevisiNaskah[]
+}
+
+enum StatusPengajuan {
+  ditolak
+  diterima_untuk_ditinjau
+  revisi
+  proses_cetak
+  diterbitkan
+}
+
+model FileNaskah {
+  id          Int    @id @default(autoincrement())
+  buku        Book   @relation(fields: [buku_id], references: [id])
+  buku_id     Int
+  file_naskah String @db.VarChar(200)
+}
+
+model RevisiNaskah {
+  id                Int           @id @default(autoincrement())
+  pengajuan_buku    PengajuanBuku @relation(fields: [pengajuan_buku_id], references: [id])
+  pengajuan_buku_id Int
+  pengguna          Pengguna      @relation(fields: [pengguna_id], references: [id])
+  pengguna_id       BigInt
+  is_editor         Boolean
+}
+
+model Invoice {
+  id               Int           @id @default(autoincrement())
+  pengguna         Pengguna      @relation(fields: [pengguna_id], references: [id])
+  pengguna_id      BigInt
+  buku             Book          @relation(fields: [buku_id], references: [id])
+  buku_id          Int
+  total_pembayaran Int
+  status           StatusInvoice
+  tanggal_bayar    DateTime
+}
+
+enum StatusInvoice {
+  belum_dibayar
+  sudah_dibayar
+  gagal
 }

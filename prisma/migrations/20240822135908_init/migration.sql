@@ -1,13 +1,14 @@
 -- CreateTable
 CREATE TABLE `pengguna` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `username` VARCHAR(200) NOT NULL,
     `password` VARCHAR(200) NOT NULL,
+    `nama` VARCHAR(200) NOT NULL,
     `email` VARCHAR(200) NOT NULL,
-    `thumbnail` VARCHAR(200) NOT NULL,
-    `type` ENUM('ADMIN', 'USER') NOT NULL,
-    `phone` VARCHAR(13) NOT NULL,
-    `is_simat` VARCHAR(200) NOT NULL,
+    `thumbnail` VARCHAR(200) NULL,
+    `type` ENUM('ADMIN', 'USER') NOT NULL DEFAULT 'USER',
+    `phone` VARCHAR(13) NULL,
+    `is_simat` BOOLEAN NOT NULL DEFAULT false,
     `has_verified_email` BOOLEAN NOT NULL DEFAULT false,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
@@ -32,7 +33,7 @@ CREATE TABLE `role` (
 -- CreateTable
 CREATE TABLE `hak_akses_pengguna` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `user_id` BIGINT NOT NULL,
+    `user_id` INTEGER NOT NULL,
     `role_id` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -45,7 +46,7 @@ CREATE TABLE `news` (
     `isi` TEXT NOT NULL,
     `cover` VARCHAR(200) NOT NULL,
     `dilihat` INTEGER NOT NULL DEFAULT 0,
-    `penulis_id` BIGINT NOT NULL,
+    `penulis_id` INTEGER NOT NULL,
     `tanggal_publish` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
@@ -66,10 +67,10 @@ CREATE TABLE `kategori_buku` (
 CREATE TABLE `Book` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `kategori_buku_id` INTEGER NOT NULL,
-    `layouter_id` BIGINT NOT NULL,
-    `proofreader_id` BIGINT NOT NULL,
-    `editor_id` BIGINT NOT NULL,
-    `desainer_id` BIGINT NOT NULL,
+    `layouter_id` INTEGER NOT NULL,
+    `proofreader_id` INTEGER NOT NULL,
+    `editor_id` INTEGER NOT NULL,
+    `desainer_id` INTEGER NOT NULL,
     `pengarang` VARCHAR(200) NOT NULL,
     `judul` VARCHAR(200) NOT NULL,
     `sinopsis` TEXT NOT NULL,
@@ -103,7 +104,7 @@ CREATE TABLE `PengajuanISBN` (
 CREATE TABLE `PengajuanBuku` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `buku_id` INTEGER NOT NULL,
-    `pengguna_id` BIGINT NOT NULL,
+    `pengguna_id` INTEGER NOT NULL,
     `status_pengajuan` ENUM('ditolak', 'diterima_untuk_ditinjau', 'revisi', 'proses_cetak', 'diterbitkan') NOT NULL,
     `alasan_penolakan` TEXT NULL,
     `tanggal_ditolak` DATETIME(3) NULL,
@@ -129,7 +130,7 @@ CREATE TABLE `FileNaskah` (
 CREATE TABLE `RevisiNaskah` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `pengajuan_buku_id` INTEGER NOT NULL,
-    `pengguna_id` BIGINT NOT NULL,
+    `pengguna_id` INTEGER NOT NULL,
     `is_editor` BOOLEAN NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -138,7 +139,7 @@ CREATE TABLE `RevisiNaskah` (
 -- CreateTable
 CREATE TABLE `Invoice` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `pengguna_id` BIGINT NOT NULL,
+    `pengguna_id` INTEGER NOT NULL,
     `buku_id` INTEGER NOT NULL,
     `total_pembayaran` INTEGER NOT NULL,
     `status` ENUM('belum_dibayar', 'sudah_dibayar', 'gagal') NOT NULL,

@@ -19,13 +19,14 @@ enum Type {
 }
 
 model Pengguna {
-  id                 BigInt           @id @default(autoincrement())
+  id                 Int              @id @default(autoincrement())
   username           String           @unique @db.VarChar(200)
   password           String           @db.VarChar(200)
+  nama               String           @db.VarChar(200)
   email              String           @unique @db.VarChar(200)
   thumbnail          String?          @db.VarChar(200)
   type               Type             @default(USER)
-  phone              String           @unique @db.VarChar(13)
+  phone              String?          @unique @db.VarChar(13)
   is_simat           Boolean          @default(false)
   has_verified_email Boolean          @default(false)
   created_at         DateTime         @default(now())
@@ -57,7 +58,7 @@ model Role {
 model UserPrivillege {
   id       Int      @id @default(autoincrement())
   pengguna Pengguna @relation(fields: [user_id], references: [id])
-  user_id  BigInt
+  user_id  Int
   role     Role     @relation(fields: [role_id], references: [id])
   role_id  Int
 
@@ -71,7 +72,7 @@ model News {
   cover           String   @db.VarChar(200)
   dilihat         Int      @default(0)
   penulis         Pengguna @relation(fields: [penulis_id], references: [id])
-  penulis_id      BigInt
+  penulis_id      Int
   tanggal_publish DateTime @default(now())
 
   @@map("news")
@@ -93,13 +94,13 @@ model Book {
   kategori_buku     BookCategory       @relation(fields: [kategori_buku_id], references: [id])
   kategori_buku_id  Int
   layouter          Pengguna           @relation("book_layouter", fields: [layouter_id], references: [id])
-  layouter_id       BigInt
+  layouter_id       Int
   proofreader       Pengguna           @relation("book_proofreader", fields: [proofreader_id], references: [id])
-  proofreader_id    BigInt
+  proofreader_id    Int
   editor            Pengguna           @relation("book_editor", fields: [editor_id], references: [id])
-  editor_id         BigInt
+  editor_id         Int
   desainer          Pengguna           @relation("book_designer", fields: [desainer_id], references: [id])
-  desainer_id       BigInt
+  desainer_id       Int
   pengarang         String             @db.VarChar(200)
   judul             String             @db.VarChar(200)
   sinopsis          String             @db.Text
@@ -151,7 +152,7 @@ model PengajuanBuku {
   buku             Book            @relation(fields: [buku_id], references: [id])
   buku_id          Int
   pengguna         Pengguna        @relation(fields: [pengguna_id], references: [id])
-  pengguna_id      BigInt
+  pengguna_id      Int
   status_pengajuan StatusPengajuan
   alasan_penolakan String?         @db.Text
   tanggal_ditolak  DateTime?
@@ -183,14 +184,14 @@ model RevisiNaskah {
   pengajuan_buku    PengajuanBuku @relation(fields: [pengajuan_buku_id], references: [id])
   pengajuan_buku_id Int
   pengguna          Pengguna      @relation(fields: [pengguna_id], references: [id])
-  pengguna_id       BigInt
+  pengguna_id       Int
   is_editor         Boolean
 }
 
 model Invoice {
   id               Int           @id @default(autoincrement())
   pengguna         Pengguna      @relation(fields: [pengguna_id], references: [id])
-  pengguna_id      BigInt
+  pengguna_id      Int
   buku             Book          @relation(fields: [buku_id], references: [id])
   buku_id          Int
   total_pembayaran Int

@@ -10,14 +10,11 @@ class UserValidator {
       return ErrorHandler.badRequest('Username is required');
     }
 
-    // check lengh of username string
     if(typeof username !== 'string') {
       return ErrorHandler.badRequest('Username is not valid');
     }
 
     const usernameBody = username.toString();
-
-
 
     if (usernameBody.length < 4) {
       return ErrorHandler.badRequest('Username is too short');
@@ -58,12 +55,9 @@ class UserValidator {
     return this;
   }
 
-  static validate(req) {
-    if(req.body.isSimat) {
-      req.body.is_simat = req.body.isSimat;
-    }
+  static validate(user) {
     const validator = new UserValidator();
-    validator.isUsername(req.body.username).isEmail(req.body.email).isPassword(req.body.password).isPhone(req.body.phone).isSimat(req.body.is_simat);
+    validator.isUsername(user.username).isEmail(user.email).isPassword(user.password).isPhone(user.phone).isSimat(user.isSimat);
   }
 }
 

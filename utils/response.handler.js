@@ -1,16 +1,15 @@
 const responseSuccess = (res, data, message, code) => {
   res.status(code || 200).json({
-    status: 'success',
+    status: true,
     message,
     data,
   });
 }
 
-const responseError = (res, error, message, code) => {
+const responseError = (res, message, code) => {
   res.status(code || 500).send({
-    status: 'error',
-    message,
-    error,
+    status: false,
+    message
   });
 }
 

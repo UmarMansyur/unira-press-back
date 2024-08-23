@@ -2,14 +2,13 @@ const Authentication = require("../services/authentication");
 const { responseSuccess, responseError } = require("../utils/response.handler");
 
 class AuthenticationController {
-
-  async register(req, res) {
+  async register(req, res, next) {
     try {
       const auth = new Authentication(req);
       const result = await auth.register(req);
       return responseSuccess(res, result, 'User registered successfully', 201);
     } catch (error) {
-      return responseError(res, error, error.message, error.code);
+      next(error);
     }
   }
 
@@ -33,19 +32,34 @@ class AuthenticationController {
     }
   }
 
-  async forgotPassword(req, res) {
-    await this.auth.forgotPassword(req);
-    return responseSuccess(res, null, 'Email sent successfully');
+  async forgotPassword(req, res, next) {
+    try {
+      const auth = new Authentication();
+      const result = await auth.forgotPassword(req);
+      return responseSuccess(res, result, 'Email sent successfully');
+    } catch (error) {
+      next(error); 
+    }
   }
 
-  async resetPassword(req, res) {
-    await this.auth.resetPassword(req);
-    return responseSuccess(res, null, 'Password reset successfully');
+  async resetPassword(req, res, next) {
+    try {
+      const auth = new Authentication();
+      const result = await auth.resetPassword(req);
+      return responseSuccess(res, result, 'Password reset successfully');
+    } catch (error) {
+      next(error)
+    }
   }
 
-  async changePassword(req, res) {
-    await this.auth.changePassword(req);
-    return responseSuccess(res, null, 'Password changed successfully');
+  async changePassword(req, res, next) {
+    try {
+      const auth = new Authentication();
+      const result = await auth.changePassword(req);
+      return responseSuccess(res, result, 'Password changed successfully');
+    } catch (error) {
+      next(error);
+    }
   }
 }
 

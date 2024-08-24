@@ -48,6 +48,13 @@ class UserRepository {
       where: {
         username,
       },
+      include: {
+        UserPrivillege: {
+          include: {
+            role: true,
+          }
+        },
+      }
     });
   }
   findByEmail(email) {

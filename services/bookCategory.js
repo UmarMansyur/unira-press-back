@@ -1,4 +1,4 @@
-const BookCategoryRepository = require('../repository/BookCategoryRepository');
+const BookCategoryRepository = require('../repositories/BookCategoryRepository');
 const BookCategory = require('../libs/BookCategory');
 const BookCategoryValidator = require('../libs/BookCategoryValidator');
 
@@ -22,6 +22,7 @@ class BookCategoryService {
     const bookCategory = new BookCategory(null, name);
     BookCategoryValidator.validate(bookCategory);
     await this.checkDuplicateName(name);
+    delete bookCategory.id;
     return await this.bookCategoryRepository.create(bookCategory);
   }
 

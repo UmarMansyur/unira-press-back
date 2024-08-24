@@ -1,11 +1,11 @@
 class BookCategory {
   constructor(id, name) {
-    this.id = id;
+    this.id = Number(id);
     this.name = name;
   }
 
   setId(id) {
-    this.id = id;
+    this.id = Number(id);
     return this;
   }
   
@@ -13,6 +13,6 @@ class BookCategory {
     this.name = name;
     return this;
   }
-
-
 }
+
+module.exports = BookCategory;

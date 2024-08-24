@@ -7,7 +7,7 @@ class BookController {
 
   async create(req, res, next) {
     try {
-      const result = await this.bookService.create(req.body);
+      const result = await this.bookService.create(req);
       return responseSuccess(res, result, 'Buku berhasil ditambahkan!', 201);
     } catch (error) {
       next(error);
@@ -16,7 +16,7 @@ class BookController {
 
   async update(req, res, next) {
     try {
-      const result = await this.bookService.update(req.params.id, req.body);
+      const result = await this.bookService.update(req);
       return responseSuccess(res, result, 'Buku berhasil dirubah!');
     } catch (error) {
       next(error);
@@ -25,7 +25,7 @@ class BookController {
 
   async delete(req, res, next) {
     try {
-      const result = await this.bookService.delete(req.params.id);
+      const result = await this.bookService.delete(req);
       return responseSuccess(res, result, 'Buku berhasil dihapus!');
     } catch (error) {
       next(error);
@@ -43,7 +43,7 @@ class BookController {
 
   async findById(req, res, next) {
     try {
-      const result = await this.bookService.findById(req.params.id);
+      const result = await this.bookService.findById(req);
       return responseSuccess(res, result, 'Detail buku berhasil ditampilkan!');
     } catch (error) {
       next(error);
@@ -52,7 +52,7 @@ class BookController {
 
   async paginate(req, res, next) {
     try {
-      const result = await this.bookService.paginate(req.query);
+      const result = await this.bookService.paginate(req);
       return responseSuccess(res, result, 'Daftar buku berhasil ditampilkan!');
     } catch (error) {
       next(error);

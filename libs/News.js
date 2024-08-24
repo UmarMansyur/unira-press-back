@@ -29,3 +29,5 @@ class News {
     return this;
   }
 }
+
+module.exports = News;

@@ -33,7 +33,7 @@ class NewsRepository {
   async findById(id) {
     return await this.prisma.news.findUnique({
       where: {
-        id: id
+        id: Number(id)
       }
     });
   }
@@ -41,7 +41,7 @@ class NewsRepository {
   async update(id, news) {
     return await this.prisma.news.update({
       where: {
-        id: id
+        id: Number(id)
       },
       data: news
     });
@@ -50,7 +50,7 @@ class NewsRepository {
   async delete(id) {
     return await this.prisma.news.delete({
       where: {
-        id: id
+        id: Number(id)
       }
     });
   }

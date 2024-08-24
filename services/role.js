@@ -1,4 +1,4 @@
-const RoleRepository = require('../repository/RoleRepository');
+const RoleRepository = require('../repositories/RoleRepository');
 const Role = require('../libs/Role');
 const RoleValidator = require('../libs/RoleValidator');
 class RoleService {

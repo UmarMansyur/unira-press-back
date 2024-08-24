@@ -75,7 +75,7 @@ model News {
   penulis_id      Int
   tanggal_publish DateTime @default(now())
 
-  @@map("news")
+  @@map("berita")
 }
 
 model BookCategory {
@@ -120,6 +120,8 @@ model Book {
   PengajuanBuku     PengajuanBuku[]
   FileNaskah        FileNaskah[]
   Invoice           Invoice[]
+
+  @@map("buku")
 }
 
 enum TypeWriting {
@@ -138,6 +140,8 @@ model PengajuanISBN {
   buku    Book   @relation(fields: [buku_id], references: [id])
   buku_id Int
   status  Status
+
+  @@map("pengajuan_isbn")
 }
 
 enum Status {
@@ -162,6 +166,8 @@ model PengajuanBuku {
   tanggal_cetak    DateTime?
   tanggal_terbit   DateTime?
   RevisiNaskah     RevisiNaskah[]
+
+  @@map("pengajuan_buku")
 }
 
 enum StatusPengajuan {
@@ -177,6 +183,8 @@ model FileNaskah {
   buku        Book   @relation(fields: [buku_id], references: [id])
   buku_id     Int
   file_naskah String @db.VarChar(200)
+
+  @@map("file_naskah")
 }
 
 model RevisiNaskah {
@@ -186,6 +194,8 @@ model RevisiNaskah {
   pengguna          Pengguna      @relation(fields: [pengguna_id], references: [id])
   pengguna_id       Int
   is_editor         Boolean
+
+  @@map("revisi_naskah")
 }
 
 model Invoice {
@@ -197,6 +207,8 @@ model Invoice {
   total_pembayaran Int
   status           StatusInvoice
   tanggal_bayar    DateTime
+
+  @@map("invoice")
 }
 
 enum StatusInvoice {

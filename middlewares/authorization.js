@@ -16,11 +16,11 @@ function authorize(roles = []) {
                 const user = jwt.verify(bearerToken, process.env.JWT_SECRET);
                 if (roles.length > 0) {
                     let valid = '';
-                    if (typeof user.role === `string`) {
-                        valid = roles.find((level) => level === user.role);
+                    if (typeof user.roles === `string`) {
+                        valid = roles.find((level) => level === user.roles);
                     } else {
-                        if (user.role.length > 0) {
-                            valid = user.role.find((level) => roles.includes(level));
+                        if (user.roles.length > 0) {
+                            valid = user.roles.find((level) => roles.includes(level));
                         }
                     }
                     if (!valid) {

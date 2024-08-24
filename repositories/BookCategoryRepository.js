@@ -28,14 +28,14 @@ class BookCategoryRepository {
 
   async update(id, book) {
     return await this.prisma.bookCategory.update({
-      where: { id: id },
+      where: { id: Number(id) },
       data: book
     });
   }
 
   async delete(id) {
     return await this.prisma.bookCategory.delete({
-      where: { id: id }
+      where: { id: Number(id) }
     });
   }
 
@@ -45,7 +45,7 @@ class BookCategoryRepository {
 
   async findById(id) {
     return await this.prisma.bookCategory.findUnique({
-      where: { id: id }
+      where: { id: Number(id) }
     });
   }
 
@@ -65,6 +65,12 @@ class BookCategoryRepository {
 
     const total = await this.prisma.bookCategory.count({ where });
     return { data, total };
+  }
+
+  async findByName(name) {
+    return await this.prisma.bookCategory.findUnique({
+      where: { name: name }
+    });
   }
 }
 

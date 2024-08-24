@@ -1,6 +1,6 @@
 const User = require('../libs/User.js');
 const UserValidator = require('../libs/UserValidator.js');
-const UserRepository = require('../repository/UserRepository.js');
+const UserRepository = require('../repositories/UserRepository.js');
 const prisma = require('../utils/client.js');
 const ErrorHandler = require('../utils/error.js');
 const { sendMail } = require('../utils/nodemailer.js');
@@ -13,7 +13,8 @@ class Authentication {
   }
 
   async register(req) {
-    const user = new User(req.body);
+    const user = new User();
+    user.setUsername(req.body.username).setEmail(req.body.email).setName(req.body.nama).setPassword(req.body.password).setPhone(req.body.phone).setIsSimat(req.body.is_simat);
     UserValidator.validate(user);
 
     const existingUser = await this.user.findByEmail(user.email);
@@ -23,6 +24,13 @@ class Authentication {
     }
 
     const result = await this.user.create(user);
+    await this.prisma.userPrivillege.create({
+      data: {
+        user_id: result.id,
+        role_id: 2,
+      },
+    });
+
     const token = generateToken({ id: result.id });
 
     if (!user.isSimat) {
@@ -67,10 +75,18 @@ class Authentication {
     }
 
     if (!bcrypt.compareSync(password, user.password)) {
-      return ErrorHandler.unauthorized('Password tidak sesuai!');
+      return ErrorHandler.unAuthorized('Password tidak sesuai!');
     }
 
-    return generateToken({ id: user.id });
+    if(!user.has_verified_email) {
+      await sendMail(user.email, 'Email Verification', 'Click the link below to verify your email <a href="' + link + '">Verify Email</a>');
+      return ErrorHandler.unAuthorized('Email belum diverifikasi, silahkan cek email anda');
+    }
+
+    const token = generateToken({ id: user.id, roles: user.UserPrivillege.map(role => role.role.name) });
+    return {
+      token
+    }
   }
 
   async loginSimat(req) {

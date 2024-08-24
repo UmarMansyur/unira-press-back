@@ -1,7 +1,6 @@
 const { Type } = require('@prisma/client');
 const bcrypt = require('bcrypt');
 class User {
-
     setId(id) {
       this.id = id;
       return this;

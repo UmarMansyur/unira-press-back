@@ -5,6 +5,21 @@ class NewsRepository {
     this.prisma = prisma;
   }
 
+  setLimit(limit) {
+    this.limit = limit;
+    return this;
+  }
+
+  setOffset(offset) {
+    this.offset = offset;
+    return this;
+  }
+
+  setSearch(search) {
+    this.search = search;
+    return this;
+  }
+
   async create(news) {
     return await this.prisma.news.create({
       data: news
@@ -31,13 +46,43 @@ class NewsRepository {
       data: news
     });
   }
-  
+
   async delete(id) {
     return await this.prisma.news.delete({
       where: {
         id: id
       }
     });
+  }
+
+  async paginate() {
+    const where = {};
+    if (this.search) {
+      where.OR = [
+        {
+          judul_berita: {
+            contains: this.search
+          }
+        },
+        {
+          isi: {
+            contains: this.search
+          }
+        }
+      ];
+    }
+    const data = await this.prisma.news.findMany({
+      where,
+      skip: this.offset,
+      take: this.limit
+    });
+    const total = await this.prisma.news.count({
+      where
+    });
+    return {
+      data,
+      total
+    };
   }
 }
 

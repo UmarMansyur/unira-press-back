@@ -46,9 +46,10 @@ class NewsValidator {
     const validator = new NewsValidator();
     validator.validateJudulBerita(news.judul_berita)
       .validateIsi(news.isi)
-      .validateCover(news.cover)
-      .validateDilihat(news.dilihat)
       .validatePenulisId(news.penulis_id);
+    if (news.cover) {
+      validator.validateCover(news.cover);
+    }
   }
 
 

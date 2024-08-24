@@ -4,12 +4,10 @@ const news = new NewsController();
 const auth = require('../middlewares/authorization');
 const upload = require('../utils/multer');
 
-router.post('/', auth, upload.single('image'), news.createNews.bind(news));
-router.put('/:id', auth, upload.single('image'), news.updateNews.bind(news));
-router.delete('/:id', auth, news.deleteNews.bind(news));
-router.get('/', auth, news.findAllNews.bind(news));
-router.get('/:id', auth, news.findNewsById.bind(news));
-
-
+router.post('/', auth(['Administrator']), upload.single('image'), news.createNews);
+router.put('/:id', auth(['Administrator']), upload.single('image'), news.updateNews);
+router.delete('/:id', auth(['Administrator']), news.deleteNews);
+router.get('/', news.findAllNews);
+router.get('/:id', news.findNewsById);
 
 module.exports = router;

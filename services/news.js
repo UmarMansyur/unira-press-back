@@ -18,10 +18,9 @@ class NewsService {
       news.setCover(file.path);
     }
     NewsValidator.validateNews(news);
-    return await NewsRepository.create(news);
+    return await this.news.create(news);
   }
 
-  // hapus file in uploads when existing file is updated
   async deleteFile(filePath) {
     if (fs.existsSync(path.join(__dirname, filePath))) {
       fs.unlinkSync(path.join(__dirname, filePath));
@@ -53,7 +52,7 @@ class NewsService {
 
     NewsValidator.validateNews(news);
 
-    return await NewsRepository.update(req.params.id, news);
+    return await this.news.update(req.params.id, news);
   }
 
   async delete(req) {
@@ -70,7 +69,8 @@ class NewsService {
     if (newsData.cover) {
       this.deleteFile(newsData.cover);
     }
-    return await NewsRepository.delete(news.id);
+    
+    return await this.news.delete(news.id);
   }
 
   async findAll(req) {

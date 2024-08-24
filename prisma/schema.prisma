@@ -69,7 +69,7 @@ model News {
   id              Int      @id @default(autoincrement())
   judul_berita    String   @db.VarChar(200)
   isi             String   @db.Text
-  cover           String   @db.VarChar(200)
+  cover           String?   @db.VarChar(200)
   dilihat         Int      @default(0)
   penulis         Pengguna @relation(fields: [penulis_id], references: [id])
   penulis_id      Int

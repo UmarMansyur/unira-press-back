@@ -1,5 +1,5 @@
 const Authentication = require("../services/authentication");
-const { responseSuccess, responseError } = require("../utils/response.handler");
+const { responseSuccess } = require("../utils/response.handler");
 
 class AuthenticationController {
   async register(req, res, next) {

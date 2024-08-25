@@ -57,9 +57,9 @@ model Role {
 
 model UserPrivillege {
   id       Int      @id @default(autoincrement())
-  pengguna Pengguna @relation(fields: [user_id], references: [id])
+  pengguna Pengguna @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id  Int
-  role     Role     @relation(fields: [role_id], references: [id])
+  role     Role     @relation(fields: [role_id], references: [id], onDelete: Cascade)
   role_id  Int
 
   @@map("hak_akses_pengguna")
@@ -69,9 +69,9 @@ model News {
   id              Int      @id @default(autoincrement())
   judul_berita    String   @db.VarChar(200)
   isi             String   @db.Text
-  cover           String?   @db.VarChar(200)
+  cover           String?  @db.VarChar(200)
   dilihat         Int      @default(0)
-  penulis         Pengguna @relation(fields: [penulis_id], references: [id])
+  penulis         Pengguna @relation(fields: [penulis_id], references: [id], onDelete: Cascade)
   penulis_id      Int
   tanggal_publish DateTime @default(now())
 
@@ -91,30 +91,30 @@ model BookCategory {
 
 model Book {
   id                Int                @id @default(autoincrement())
-  kategori_buku     BookCategory       @relation(fields: [kategori_buku_id], references: [id])
+  kategori_buku     BookCategory       @relation(fields: [kategori_buku_id], references: [id], onDelete: Cascade)
   kategori_buku_id  Int
-  layouter          Pengguna           @relation("book_layouter", fields: [layouter_id], references: [id])
-  layouter_id       Int
-  proofreader       Pengguna           @relation("book_proofreader", fields: [proofreader_id], references: [id])
-  proofreader_id    Int
-  editor            Pengguna           @relation("book_editor", fields: [editor_id], references: [id])
-  editor_id         Int
-  desainer          Pengguna           @relation("book_designer", fields: [desainer_id], references: [id])
-  desainer_id       Int
+  layouter          Pengguna?          @relation("book_layouter", fields: [layouter_id], references: [id], onDelete: Cascade)
+  layouter_id       Int?
+  proofreader       Pengguna?          @relation("book_proofreader", fields: [proofreader_id], references: [id], onDelete: Cascade)
+  proofreader_id    Int?
+  editor            Pengguna?          @relation("book_editor", fields: [editor_id], references: [id], onDelete: Cascade)
+  editor_id         Int?
+  desainer          Pengguna?          @relation("book_designer", fields: [desainer_id], references: [id], onDelete: Cascade)
+  desainer_id       Int?
   pengarang         String             @db.VarChar(200)
   judul             String             @db.VarChar(200)
   sinopsis          String             @db.Text
   file_cover        String?            @db.VarChar(200)
   tipe_identifikasi IdentificationType
   isbn              String?            @unique @db.VarChar(200)
-  jumlah_halaman    Int
+  jumlah_halaman    Int?
   ukuran            String             @db.VarChar(200)
   tanggal_pengajuan DateTime           @default(now())
-  tanggal_publish   DateTime
+  tanggal_publish   DateTime?
   harga             Int?
   tipe_kepenulisan  TypeWriting
-  penanggung_jawab  String             @db.VarChar(200)
-  tahun_terbit      Int
+  penanggung_jawab  String?            @db.VarChar(200)
+  tahun_terbit      Int?
   dilihat           Int                @default(0)
   PengajuanISBN     PengajuanISBN[]
   PengajuanBuku     PengajuanBuku[]
@@ -137,9 +137,10 @@ enum IdentificationType {
 
 model PengajuanISBN {
   id      Int    @id @default(autoincrement())
-  buku    Book   @relation(fields: [buku_id], references: [id])
+  buku    Book   @relation(fields: [buku_id], references: [id], onDelete: Cascade)
   buku_id Int
-  status  Status
+  status  Status @default(proses)
+  alasan_penolakan String? @db.Text
 
   @@map("pengajuan_isbn")
 }
@@ -153,11 +154,11 @@ enum Status {
 
 model PengajuanBuku {
   id               Int             @id @default(autoincrement())
-  buku             Book            @relation(fields: [buku_id], references: [id])
+  buku             Book            @relation(fields: [buku_id], references: [id], onDelete: Cascade)
   buku_id          Int
-  pengguna         Pengguna        @relation(fields: [pengguna_id], references: [id])
+  pengguna         Pengguna        @relation(fields: [pengguna_id], references: [id], onDelete: Cascade)
   pengguna_id      Int
-  status_pengajuan StatusPengajuan
+  status_pengajuan StatusPengajuan @default(diproses)
   alasan_penolakan String?         @db.Text
   tanggal_ditolak  DateTime?
   tanggal_diterima DateTime?
@@ -172,6 +173,7 @@ model PengajuanBuku {
 
 enum StatusPengajuan {
   ditolak
+  diproses
   diterima_untuk_ditinjau
   revisi
   proses_cetak
@@ -180,7 +182,7 @@ enum StatusPengajuan {
 
 model FileNaskah {
   id          Int    @id @default(autoincrement())
-  buku        Book   @relation(fields: [buku_id], references: [id])
+  buku        Book   @relation(fields: [buku_id], references: [id], onDelete: Cascade)
   buku_id     Int
   file_naskah String @db.VarChar(200)
 
@@ -189,24 +191,27 @@ model FileNaskah {
 
 model RevisiNaskah {
   id                Int           @id @default(autoincrement())
-  pengajuan_buku    PengajuanBuku @relation(fields: [pengajuan_buku_id], references: [id])
+  pengajuan_buku    PengajuanBuku @relation(fields: [pengajuan_buku_id], references: [id], onDelete: Cascade)
   pengajuan_buku_id Int
-  pengguna          Pengguna      @relation(fields: [pengguna_id], references: [id])
+  pengguna          Pengguna      @relation(fields: [pengguna_id], references: [id], onDelete: Cascade)
   pengguna_id       Int
-  is_editor         Boolean
+  is_editor         Boolean       @default(false)
+  komentar          String        @db.Text
+
 
   @@map("revisi_naskah")
 }
 
 model Invoice {
   id               Int           @id @default(autoincrement())
-  pengguna         Pengguna      @relation(fields: [pengguna_id], references: [id])
+  pengguna         Pengguna      @relation(fields: [pengguna_id], references: [id], onDelete: Cascade)
   pengguna_id      Int
-  buku             Book          @relation(fields: [buku_id], references: [id])
+  buku             Book          @relation(fields: [buku_id], references: [id], onDelete: Cascade)
   buku_id          Int
-  total_pembayaran Int
-  status           StatusInvoice
-  tanggal_bayar    DateTime
+  total_pembayaran Float         @default(0) @db.Double
+  keterangan       String        @db.Text
+  status           StatusInvoice @default(belum_dibayar)
+  tanggal_bayar    DateTime?
 
   @@map("invoice")
 }

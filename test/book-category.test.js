@@ -29,10 +29,10 @@ describe('get book category', () => {
   });
 
   it('Should get book category', async () => {
-    await BookCategoryTest.create();
+    const news = await BookCategoryTest.create();
     const response = await supertest(app).get('/book-categories');
     expect(response.statusCode).toEqual(200);
-    expect(response.body.data[0].name).toBe('Terjemahan Fiksi');
+    expect(response.body.data[5].name).toBe('Terjemahan Fiksi');
   });
 });
 

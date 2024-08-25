@@ -8,7 +8,7 @@ class RoleService {
 
   async create(req) {
     const { name } = req.body;
-    const role = new Role(null, name);
+    const role = new Role(name);
     RoleValidator.validate(role);
     return await this.roleRepository.create(role);
   }
@@ -16,7 +16,7 @@ class RoleService {
   async update(req) {
     const { id } = req.params;
     const { name } = req.body;
-    const role = new Role(id, name);
+    const role = new Role(name);
     RoleValidator.validate(role);
     return await this.roleRepository.update(id, role);
   }

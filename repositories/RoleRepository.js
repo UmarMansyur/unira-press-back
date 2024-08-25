@@ -28,14 +28,14 @@ class RoleRepository {
 
   async update(id, role) {
     return await this.prisma.role.update({
-      where: { id: id },
+      where: { id: Number(id) },
       data: role
     });
   }
 
   async delete(id) {
     return await this.prisma.role.delete({
-      where: { id: id }
+      where: { id: Number(id) }
     });
   }
 
@@ -45,7 +45,7 @@ class RoleRepository {
 
   async findById(id) {
     return await this.prisma.role.findUnique({
-      where: { id: id }
+      where: { id: Number(id) }
     });
   }
 

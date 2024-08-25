@@ -2,9 +2,6 @@ const NewsService = require("../services/news");
 const { responseSuccess } = require('../utils/response.handler');
 
 class NewsController {
-  constructor() {
-    this.news = new NewsService();
-  }
   async createNews(req, res, next) {
     try {
       const news = new NewsService();

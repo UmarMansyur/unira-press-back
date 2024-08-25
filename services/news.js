@@ -22,8 +22,8 @@ class NewsService {
   }
 
   async deleteFile(filePath) {
-    if (fs.existsSync(path.join(__dirname, filePath))) {
-      fs.unlinkSync(path.join(__dirname, filePath));
+    if (fs.existsSync(path.join(__dirname, '../', filePath))) {
+      fs.unlinkSync(path.join(__dirname, '../', filePath));
     }
   }
 
@@ -41,7 +41,7 @@ class NewsService {
 
     const file = req.file;
 
-    news.setId(req.params.id).setCover(newsData.cover || file.path).setJudulBerita(req.body.judul_berita || newsData.judul_berita).setIsi(req.body.isi || newsData.isi).setDilihat(req.body.dilihat || newsData.dilihat);
+    news.setId(req.params.id).setCover(newsData.cover || file.path).setJudulBerita(req.body.judul_berita || newsData.judul_berita).setIsi(req.body.isi || newsData.isi).setDilihat(req.body.dilihat || newsData.dilihat).setPenulisId(req.user.id);
 
     if (file) {
       news.setCover(file.path);
@@ -51,6 +51,7 @@ class NewsService {
     }
 
     NewsValidator.validateNews(news);
+    delete news.id;
 
     return await this.news.update(req.params.id, news);
   }
@@ -58,14 +59,18 @@ class NewsService {
   async delete(req) {
     const news = new News();
     news.setId(req.params.id);
-    NewsValidator.validateId(news.id);
+    const newsValidator = new NewsValidator();
+    newsValidator.validateId(news.id);
     const newsData = await this.news.findById(news.id);
+
     if (!newsData) {
       return ErrorHandler.badRequest("Berita tidak ditemukan");
     }
+
     if (req.user.id !== newsData.penulis_id) {
       return ErrorHandler.forbidden("Anda tidak memiliki akses untuk menghapus berita ini");
     }
+
     if (newsData.cover) {
       this.deleteFile(newsData.cover);
     }

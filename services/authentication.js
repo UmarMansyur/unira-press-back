@@ -93,7 +93,13 @@ class Authentication {
     const { username, password } = req.body;
 
     const user = await this.fetchSimat(username, password);
+    const roles = [];
     const existUser = await this.user.findByUsername(user.username);
+    if(existUser && existUser.UserPrivillege) {
+      existUser.UserPrivillege.forEach(role => {
+        roles.push(role.role.name);
+      });
+    }
 
     if (existUser) {
       await this.user.update(existUser.id, {
@@ -109,10 +115,14 @@ class Authentication {
       user.password = password;
       user.generatePassword = bcrypt.hashSync(password, 10);
       const result = await this.user.create(user);
+      roles.push('Pengguna');
       user.id = result.id;
     }
     
-    return generateToken({ id: user.id });
+    const token = generateToken({ id: user.id, roles });
+    return {
+      token
+    }
   }
 
   async fetchSimat(username, password) {

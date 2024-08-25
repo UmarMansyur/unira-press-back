@@ -10,7 +10,7 @@ class UserTest {
     await userTest.prisma.pengguna.deleteMany({
       where: {
         id: {
-          notIn: [1]
+          not: 1
         }
       }
     });
@@ -26,7 +26,7 @@ class UserTest {
         is_simat: false,
         email: "umar.ovie@gmail.com",
         nama: "Muhammad Umar Mansyur",
-        phone: "081234567890",
+        phone: "081234567891",
         has_verified_email: true
       }
     });

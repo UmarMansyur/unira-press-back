@@ -21,14 +21,14 @@ describe('Authentication SIMAT', () => {
         is_simat: false,
         email: "umar.ovie@gmail.com",
         nama: "Muhammad Umar Mansyur",
-        phone: "081234567890"
+        phone: "081234567891"
       });
 
     expect(res.statusCode).toEqual(201);
     expect(res.body.data.username).toBe("2020520018");
     expect(res.body.data.email).toBe("umar.ovie@gmail.com");
     expect(res.body.data.nama).toBe("Muhammad Umar Mansyur");
-    expect(res.body.data.phone).toBe("081234567890");
+    expect(res.body.data.phone).toBe("081234567891");
     expect(res.body.data.is_simat).toBe(false);
     expect(res.body.data.has_verified_email).toBe(false);
     expect(res.body.data.password).toBeDefined();

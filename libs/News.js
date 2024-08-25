@@ -20,7 +20,7 @@ class News {
   }
 
   setDilihat(dilihat){
-    this.dilihat = dilihat;
+    this.dilihat = Number(dilihat);
     return this;
   }
 

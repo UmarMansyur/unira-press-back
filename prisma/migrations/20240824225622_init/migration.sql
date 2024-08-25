@@ -44,7 +44,7 @@ CREATE TABLE `berita` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `judul_berita` VARCHAR(200) NOT NULL,
     `isi` TEXT NOT NULL,
-    `cover` VARCHAR(200) NOT NULL,
+    `cover` VARCHAR(200) NULL,
     `dilihat` INTEGER NOT NULL DEFAULT 0,
     `penulis_id` INTEGER NOT NULL,
     `tanggal_publish` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -67,10 +67,10 @@ CREATE TABLE `kategori_buku` (
 CREATE TABLE `buku` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `kategori_buku_id` INTEGER NOT NULL,
-    `layouter_id` INTEGER NOT NULL,
-    `proofreader_id` INTEGER NOT NULL,
-    `editor_id` INTEGER NOT NULL,
-    `desainer_id` INTEGER NOT NULL,
+    `layouter_id` INTEGER NULL,
+    `proofreader_id` INTEGER NULL,
+    `editor_id` INTEGER NULL,
+    `desainer_id` INTEGER NULL,
     `pengarang` VARCHAR(200) NOT NULL,
     `judul` VARCHAR(200) NOT NULL,
     `sinopsis` TEXT NOT NULL,
@@ -80,11 +80,11 @@ CREATE TABLE `buku` (
     `jumlah_halaman` INTEGER NOT NULL,
     `ukuran` VARCHAR(200) NOT NULL,
     `tanggal_pengajuan` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `tanggal_publish` DATETIME(3) NOT NULL,
+    `tanggal_publish` DATETIME(3) NULL,
     `harga` INTEGER NULL,
     `tipe_kepenulisan` ENUM('fiksi', 'non_fiksi') NOT NULL,
-    `penanggung_jawab` VARCHAR(200) NOT NULL,
-    `tahun_terbit` INTEGER NOT NULL,
+    `penanggung_jawab` VARCHAR(200) NULL,
+    `tahun_terbit` INTEGER NULL,
     `dilihat` INTEGER NOT NULL DEFAULT 0,
 
     UNIQUE INDEX `buku_isbn_key`(`isbn`),
@@ -95,7 +95,7 @@ CREATE TABLE `buku` (
 CREATE TABLE `pengajuan_isbn` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `buku_id` INTEGER NOT NULL,
-    `status` ENUM('proses', 'permohonan_revisi', 'ditolak', 'isbn_diterbitkan') NOT NULL,
+    `status` ENUM('proses', 'permohonan_revisi', 'ditolak', 'isbn_diterbitkan') NOT NULL DEFAULT 'proses',
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -105,7 +105,7 @@ CREATE TABLE `pengajuan_buku` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `buku_id` INTEGER NOT NULL,
     `pengguna_id` INTEGER NOT NULL,
-    `status_pengajuan` ENUM('ditolak', 'diterima_untuk_ditinjau', 'revisi', 'proses_cetak', 'diterbitkan') NOT NULL,
+    `status_pengajuan` ENUM('ditolak', 'diproses', 'diterima_untuk_ditinjau', 'revisi', 'proses_cetak', 'diterbitkan') NOT NULL DEFAULT 'diproses',
     `alasan_penolakan` TEXT NULL,
     `tanggal_ditolak` DATETIME(3) NULL,
     `tanggal_diterima` DATETIME(3) NULL,
@@ -131,7 +131,7 @@ CREATE TABLE `revisi_naskah` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `pengajuan_buku_id` INTEGER NOT NULL,
     `pengguna_id` INTEGER NOT NULL,
-    `is_editor` BOOLEAN NOT NULL,
+    `is_editor` BOOLEAN NOT NULL DEFAULT false,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -141,57 +141,58 @@ CREATE TABLE `invoice` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `pengguna_id` INTEGER NOT NULL,
     `buku_id` INTEGER NOT NULL,
-    `total_pembayaran` INTEGER NOT NULL,
-    `status` ENUM('belum_dibayar', 'sudah_dibayar', 'gagal') NOT NULL,
+    `total_pembayaran` DOUBLE NOT NULL DEFAULT 0,
+    `keterangan` TEXT NOT NULL,
+    `status` ENUM('belum_dibayar', 'sudah_dibayar', 'gagal') NOT NULL DEFAULT 'belum_dibayar',
     `tanggal_bayar` DATETIME(3) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `hak_akses_pengguna` ADD CONSTRAINT `hak_akses_pengguna_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `pengguna`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `hak_akses_pengguna` ADD CONSTRAINT `hak_akses_pengguna_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `pengguna`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `hak_akses_pengguna` ADD CONSTRAINT `hak_akses_pengguna_role_id_fkey` FOREIGN KEY (`role_id`) REFERENCES `role`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `hak_akses_pengguna` ADD CONSTRAINT `hak_akses_pengguna_role_id_fkey` FOREIGN KEY (`role_id`) REFERENCES `role`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `berita` ADD CONSTRAINT `berita_penulis_id_fkey` FOREIGN KEY (`penulis_id`) REFERENCES `pengguna`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `berita` ADD CONSTRAINT `berita_penulis_id_fkey` FOREIGN KEY (`penulis_id`) REFERENCES `pengguna`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `buku` ADD CONSTRAINT `buku_kategori_buku_id_fkey` FOREIGN KEY (`kategori_buku_id`) REFERENCES `kategori_buku`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `buku` ADD CONSTRAINT `buku_kategori_buku_id_fkey` FOREIGN KEY (`kategori_buku_id`) REFERENCES `kategori_buku`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `buku` ADD CONSTRAINT `buku_layouter_id_fkey` FOREIGN KEY (`layouter_id`) REFERENCES `pengguna`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `buku` ADD CONSTRAINT `buku_layouter_id_fkey` FOREIGN KEY (`layouter_id`) REFERENCES `pengguna`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `buku` ADD CONSTRAINT `buku_proofreader_id_fkey` FOREIGN KEY (`proofreader_id`) REFERENCES `pengguna`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `buku` ADD CONSTRAINT `buku_proofreader_id_fkey` FOREIGN KEY (`proofreader_id`) REFERENCES `pengguna`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `buku` ADD CONSTRAINT `buku_editor_id_fkey` FOREIGN KEY (`editor_id`) REFERENCES `pengguna`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `buku` ADD CONSTRAINT `buku_editor_id_fkey` FOREIGN KEY (`editor_id`) REFERENCES `pengguna`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `buku` ADD CONSTRAINT `buku_desainer_id_fkey` FOREIGN KEY (`desainer_id`) REFERENCES `pengguna`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `buku` ADD CONSTRAINT `buku_desainer_id_fkey` FOREIGN KEY (`desainer_id`) REFERENCES `pengguna`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `pengajuan_isbn` ADD CONSTRAINT `pengajuan_isbn_buku_id_fkey` FOREIGN KEY (`buku_id`) REFERENCES `buku`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `pengajuan_isbn` ADD CONSTRAINT `pengajuan_isbn_buku_id_fkey` FOREIGN KEY (`buku_id`) REFERENCES `buku`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `pengajuan_buku` ADD CONSTRAINT `pengajuan_buku_buku_id_fkey` FOREIGN KEY (`buku_id`) REFERENCES `buku`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `pengajuan_buku` ADD CONSTRAINT `pengajuan_buku_buku_id_fkey` FOREIGN KEY (`buku_id`) REFERENCES `buku`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `pengajuan_buku` ADD CONSTRAINT `pengajuan_buku_pengguna_id_fkey` FOREIGN KEY (`pengguna_id`) REFERENCES `pengguna`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `pengajuan_buku` ADD CONSTRAINT `pengajuan_buku_pengguna_id_fkey` FOREIGN KEY (`pengguna_id`) REFERENCES `pengguna`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `file_naskah` ADD CONSTRAINT `file_naskah_buku_id_fkey` FOREIGN KEY (`buku_id`) REFERENCES `buku`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `file_naskah` ADD CONSTRAINT `file_naskah_buku_id_fkey` FOREIGN KEY (`buku_id`) REFERENCES `buku`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `revisi_naskah` ADD CONSTRAINT `revisi_naskah_pengajuan_buku_id_fkey` FOREIGN KEY (`pengajuan_buku_id`) REFERENCES `pengajuan_buku`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `revisi_naskah` ADD CONSTRAINT `revisi_naskah_pengajuan_buku_id_fkey` FOREIGN KEY (`pengajuan_buku_id`) REFERENCES `pengajuan_buku`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `revisi_naskah` ADD CONSTRAINT `revisi_naskah_pengguna_id_fkey` FOREIGN KEY (`pengguna_id`) REFERENCES `pengguna`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `revisi_naskah` ADD CONSTRAINT `revisi_naskah_pengguna_id_fkey` FOREIGN KEY (`pengguna_id`) REFERENCES `pengguna`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `invoice` ADD CONSTRAINT `invoice_pengguna_id_fkey` FOREIGN KEY (`pengguna_id`) REFERENCES `pengguna`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `invoice` ADD CONSTRAINT `invoice_pengguna_id_fkey` FOREIGN KEY (`pengguna_id`) REFERENCES `pengguna`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `invoice` ADD CONSTRAINT `invoice_buku_id_fkey` FOREIGN KEY (`buku_id`) REFERENCES `buku`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `invoice` ADD CONSTRAINT `invoice_buku_id_fkey` FOREIGN KEY (`buku_id`) REFERENCES `buku`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

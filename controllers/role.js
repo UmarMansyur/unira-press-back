@@ -3,7 +3,7 @@ const { responseSuccess } = require('../utils/response.handler');
 
 class RoleController {
   constructor() {
-    this.roleService = new RoleService();
+    this.roleService = new RoleService()
   }
   
   async create(req, res, next) {

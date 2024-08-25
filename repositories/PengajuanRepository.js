@@ -195,7 +195,7 @@ class PengajuanRepository {
         id: Number(buku_id),
       },
       data: {
-        file_cover: file,
+        file_cover: file.path,
       }
     });
     return result;
@@ -242,6 +242,33 @@ class PengajuanRepository {
       }
     });
     return result;
+  }
+
+  async updateInvoice(id, data) {
+    const result = await this.prisma.invoice.update({
+      where: {
+        id: Number(id),
+      },
+      data: data,
+    });
+    return result;
+  }
+
+  async deleteInvoice(id) {
+    const result = await this.prisma.invoice.delete({
+      where: {
+        id: Number(id),
+      }
+    });
+    return result;
+  }
+
+  async getInvoice(id) {
+    return await this.prisma.invoice.findFirst({
+      where: {
+        id: Number(id),
+      }
+    });
   }
 
 }

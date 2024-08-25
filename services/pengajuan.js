@@ -127,9 +127,82 @@ class PengajuanBuku {
     return result;
   }
 
-
   async tolakPengajuanBuku(id, req) {
     const result = await this.pengajuanRepository.tolakPengajuanBuku(id, req.body.alasan_penolakan);
+    return result;
+  }
+
+  async uploadFileCover(req) {
+    const file = req.file;
+    const exist = await this.pengajuanRepository.getBuku(req.body.buku_id);
+    if (!exist) {
+      return ErrorHandler.notFound('Buku tidak ditemukan');
+    }
+    const result = await this.pengajuanRepository.uploadFileCover(req.body.buku_id, file);
+    return result;
+  }
+
+  async createRevisi(req) {
+    const exist = await this.pengajuanRepository.getPengajuanBuku(req.body.pengajuan_id);
+    if (!exist) {
+      return ErrorHandler.notFound('Pengajuan buku tidak ditemukan');
+    }
+    const result = await this.pengajuanRepository.createRevisi(req.body.pengajuan_id, req.body);
+    return result;
+  }
+
+  async updateRevisi(id, req) {
+    const exist = await this.pengajuanRepository.getRevisi(id);
+    if (!exist) {
+      return ErrorHandler.notFound('Revisi tidak ditemukan');
+    }
+    const result = await this.pengajuanRepository.updateRevisi(id, req.body);
+    return result;
+  }
+
+  async deleteRevisi(id) {
+    const exist = await this.pengajuanRepository.getRevisi(id);
+    if (!exist) {
+      return ErrorHandler.notFound('Revisi tidak ditemukan');
+    }
+    const result = await this.pengajuanRepository.deleteRevisi(id);
+    return result;
+  }
+
+  async getRevisi(id) {
+    const result = await this.pengajuanRepository.getRevisi(id);
+    return result;
+  }
+
+  async createInvoice(req) {
+    const exist = await this.pengajuanRepository.getBuku(req.body.buku_id);
+    if (!exist) {
+      return ErrorHandler.notFound('Buku tidak ditemukan');
+    }
+    const result = await this.pengajuanRepository.createInvoice(req.body.buku_id, req.body);
+    return result;
+  }
+
+  async updateInvoice(id, req) {
+    const exist = await this.pengajuanRepository.getInvoice(id);
+    if (!exist) {
+      return ErrorHandler.notFound('Invoice tidak ditemukan');
+    }
+    const result = await this.pengajuanRepository.updateInvoice(id, req.body);
+    return result;
+  }
+
+  async deleteInvoice(id) {
+    const exist = await this.pengajuanRepository.getInvoice(id);
+    if (!exist) {
+      return ErrorHandler.notFound('Invoice tidak ditemukan');
+    }
+    const result = await this.pengajuanRepository.deleteInvoice(id);
+    return result;
+  }
+
+  async getInvoice(id) {
+    const result = await this.pengajuanRepository.getInvoice(id);
     return result;
   }
 

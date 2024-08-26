@@ -62,9 +62,11 @@ class Authentication {
   }
 
   async login(req) {
-    const { username, password, is_simat } = req.body;
+    const { username, password } = req.body;
 
-    if (is_simat) {
+    const existUser = await this.user.findByUsername(username);
+
+    if (!existUser || existUser.is_simat) {
       return this.loginSimat(req);
     }
 
@@ -91,10 +93,11 @@ class Authentication {
 
   async loginSimat(req) {
     const { username, password } = req.body;
-
+    console.log(username, password);
     const user = await this.fetchSimat(username, password);
     const roles = [];
-    const existUser = await this.user.findByUsername(user.username);
+    const existUser = await this.user.findByUsername(username);
+    console.log(existUser);
     if(existUser && existUser.UserPrivillege) {
       existUser.UserPrivillege.forEach(role => {
         roles.push(role.role.name);
@@ -114,7 +117,16 @@ class Authentication {
     } else {
       user.password = password;
       user.generatePassword = bcrypt.hashSync(password, 10);
+      user.isSimat = true;
+      user.has_verified_email = true;
+      user.thumbnail = user.thumbnail;
       const result = await this.user.create(user);
+      await this.prisma.userPrivillege.create({
+        data: {
+          user_id: result.id,
+          role_id: 2,
+        },
+      });
       roles.push('Pengguna');
       user.id = result.id;
     }
@@ -136,6 +148,9 @@ class Authentication {
     });
 
     const data = await result.json();
+    if(!result.ok) {
+      return ErrorHandler.unAuthorized('Username atau password tidak sesuai');
+    }
     const token = data.data.attributes.access;
 
     const user = await this.getDataFromSimat(token);
@@ -148,6 +163,7 @@ class Authentication {
         Authorization: `Bearer ${token}`,
       },
     });
+
     const data = await response.json();
     const result = data.data.attributes;
     const user = new User();
@@ -170,6 +186,12 @@ class Authentication {
     const link = process.env.CLIENT_URL + '/reset?token=' + token;
     await sendMail(user.email, 'Reset Password', 'Click the link below to reset your password <a href="' + link + '">Reset Password</a>');
     return 'Email sent';
+  }
+
+  async whoami(req) {
+    const { id } = req.user;
+    const user = await this.user.findById(id);
+    return user;
   }
 
   async resetPassword(req) {

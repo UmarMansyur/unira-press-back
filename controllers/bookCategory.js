@@ -34,7 +34,11 @@ class BookController {
 
   async findAll(req, res, next) {
     try {
-      const result = await this.bookService.findAll();
+      if(req.query.limit && req.query.page){
+        let result = await this.bookService.paginate(req);
+        return responseSuccess(res, result, 'Daftar buku berhasil ditampilkan!');
+      }
+      let result = await this.bookService.findAll();
       return responseSuccess(res, result, 'Daftar buku berhasil ditampilkan!');
     } catch (error) {
       next(error);

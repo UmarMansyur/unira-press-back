@@ -9,11 +9,21 @@ class NewsService {
     this.news = new NewsRepository();
   }
 
+  async updateViewCount(id) {
+    const newsData = await this.news.findById(id);
+    if(!newsData) {
+      return ErrorHandler.badRequest("Berita tidak ditemukan");
+    }
+    const news = new News();
+    news.setId(id).setDilihat(newsData.dilihat + 1);
+    return await this.news.update(id, news);
+  }
+
   async create(req) {
     const user = req.user;
     const file = req.file;
     const news = new News();
-    news.setJudulBerita(req.body.judul_berita).setIsi(req.body.isi).setCover(req.body.cover).setDilihat(req.body.dilihat).setPenulisId(user.id);
+    news.setJudulBerita(req.body.judul_berita).setIsi(req.body.isi).setDilihat(req.body.dilihat).setPenulisId(user.id);
     if (file) {
       news.setCover(file.path);
     }

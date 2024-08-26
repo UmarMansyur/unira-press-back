@@ -7,6 +7,7 @@ const upload = require('../utils/multer');
 router.post('/', auth(['Administrator']), upload.single('cover'), news.createNews);
 router.put('/:id', auth(['Administrator']), upload.single('cover'), news.updateNews);
 router.delete('/:id', auth(['Administrator']), news.deleteNews);
+router.get('/:id/view', news.updateViewCount);
 router.get('/', news.findAllNews);
 router.get('/:id', news.findNewsById);
 

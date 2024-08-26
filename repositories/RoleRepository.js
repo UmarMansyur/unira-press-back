@@ -6,12 +6,12 @@ class RoleRepository {
   }
 
   setLimit(limit) {
-    this.limit = limit;
+    this.limit = Number(limit);
     return this;
   }
 
   setOffset(offset) {
-    this.offset = offset;
+    this.offset = Number(offset);
     return this;
   }
 
@@ -64,7 +64,7 @@ class RoleRepository {
     });
 
     const total = await this.prisma.role.count({ where });
-    return { data, total };
+    return { data, total, total_page: Math.ceil(total / this.limit), current_page: Math.ceil(this.offset / this.limit) + 1, limit: this.limit };
   }
 }
 

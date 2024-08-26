@@ -15,6 +15,7 @@ class UserRepository {
         is_simat: user.isSimat,
         type: user.type,
         has_verified_email: user.has_verified_email,
+        thumbnail: user.thumbnail || null,
       }
     });
   };
@@ -41,6 +42,13 @@ class UserRepository {
       where: {
         id,
       },
+      include: {
+        UserPrivillege: {
+          include: {
+            role: true,
+          }
+        },
+      }
     });
   }
   findByUsername(username) {

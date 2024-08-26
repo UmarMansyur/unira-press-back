@@ -42,6 +42,16 @@ class AuthenticationController {
     }
   }
 
+  async whoami(req, res, next) {
+    try {
+      const auth = new Authentication();
+      const result = await auth.whoami(req);
+      return responseSuccess(res, result, 'Berhasil mendapatkan data user', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async resetPassword(req, res, next) {
     try {
       const auth = new Authentication();

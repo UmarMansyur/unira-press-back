@@ -33,10 +33,6 @@ model Pengguna {
   updated_at         DateTime         @updatedAt
   UserPrivillege     UserPrivillege[]
   News               News[]
-  Book_designer      Book[]           @relation("book_designer")
-  Book_editor        Book[]           @relation("book_editor")
-  Book_layouter      Book[]           @relation("book_layouter")
-  Book               Book[]           @relation("book_proofreader")
   PengajuanBuku      PengajuanBuku[]
   RevisiNaskah       RevisiNaskah[]
   Invoice            Invoice[]
@@ -93,14 +89,10 @@ model Book {
   id                Int                @id @default(autoincrement())
   kategori_buku     BookCategory       @relation(fields: [kategori_buku_id], references: [id], onDelete: Cascade)
   kategori_buku_id  Int
-  layouter          Pengguna?          @relation("book_layouter", fields: [layouter_id], references: [id], onDelete: Cascade)
-  layouter_id       Int?
-  proofreader       Pengguna?          @relation("book_proofreader", fields: [proofreader_id], references: [id], onDelete: Cascade)
-  proofreader_id    Int?
-  editor            Pengguna?          @relation("book_editor", fields: [editor_id], references: [id], onDelete: Cascade)
-  editor_id         Int?
-  desainer          Pengguna?          @relation("book_designer", fields: [desainer_id], references: [id], onDelete: Cascade)
-  desainer_id       Int?
+  layouter          String?            @db.VarChar(200)
+  proofreader       String?            @db.VarChar(200)
+  editor            String?            @db.VarChar(200)
+  desainier         String?            @db.VarChar(200)
   pengarang         String             @db.VarChar(200)
   judul             String             @db.VarChar(200)
   sinopsis          String             @db.Text
@@ -136,10 +128,10 @@ enum IdentificationType {
 }
 
 model PengajuanISBN {
-  id      Int    @id @default(autoincrement())
-  buku    Book   @relation(fields: [buku_id], references: [id], onDelete: Cascade)
-  buku_id Int
-  status  Status @default(proses)
+  id               Int     @id @default(autoincrement())
+  buku             Book    @relation(fields: [buku_id], references: [id], onDelete: Cascade)
+  buku_id          Int
+  status           Status  @default(proses)
   alasan_penolakan String? @db.Text
 
   @@map("pengajuan_isbn")
@@ -197,7 +189,6 @@ model RevisiNaskah {
   pengguna_id       Int
   is_editor         Boolean       @default(false)
   komentar          String        @db.Text
-
 
   @@map("revisi_naskah")
 }

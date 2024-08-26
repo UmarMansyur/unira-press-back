@@ -4,12 +4,25 @@ const UserRepository = require('../repositories/UserRepository.js');
 const prisma = require('../utils/client.js');
 const ErrorHandler = require('../utils/error.js');
 const { sendMail } = require('../utils/nodemailer.js');
-const { generateToken, decodeToken } = require('../utils/token.js');
+const { generateToken, decodeToken, decodeTokenRefresh, refreshToken } = require('../utils/token.js');
 const bcrypt = require('bcrypt');
 class Authentication {
   constructor() {
     this.user = new UserRepository();
     this.prisma = prisma;
+  }
+
+  async refreshToken(req) {
+    const token = decodeTokenRefresh(req.body.refresh_token);
+    if(!token) {
+      return ErrorHandler.badRequest('Invalid token');
+    }
+    const newToken = generateToken(token);
+    const newTokenRefresh = refreshToken(token);
+    return {
+      access: newToken,
+      refresh: newTokenRefresh,
+    }
   }
 
   async register(req) {
@@ -85,9 +98,16 @@ class Authentication {
       return ErrorHandler.unAuthorized('Email belum diverifikasi, silahkan cek email anda');
     }
 
-    const token = generateToken({ id: user.id, roles: user.UserPrivillege.map(role => role.role.name) });
+    const payload = {
+      id: user.id,
+      roles: user.UserPrivillege.map(role => role.role.name)
+    }
+
+    const token = generateToken(payload);
+    const refresh = refreshToken(payload);
     return {
-      token
+      access: token,
+      refresh: refresh,
     }
   }
 
@@ -131,9 +151,13 @@ class Authentication {
       user.id = result.id;
     }
     
-    const token = generateToken({ id: user.id, roles });
+    const payload = {
+      id: user.id,
+      roles: roles,
+    }
     return {
-      token
+      access: generateToken(payload),
+      refresh: refreshToken(payload),
     }
   }
 

@@ -12,6 +12,16 @@ class AuthenticationController {
     }
   }
 
+  async refreshToken(req, res, next) {
+    try {
+      const auth = new Authentication();
+      const result = await auth.refreshToken(req);
+      return responseSuccess(res, result, 'Berhasil mendapatkan token baru', 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async verifyEmail(req, res, next) {
     try {
       const auth = new Authentication(req);

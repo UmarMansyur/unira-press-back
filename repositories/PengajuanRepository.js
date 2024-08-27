@@ -98,33 +98,27 @@ class PengajuanRepository {
         {
           kategori_buku: {
             name: {
-              contains: req.query.filter !== undefined ? req.query.filter : "",
+              contains: req.query.search !== undefined ? req.query.search : "",
             }
           }
         }
       ];
     }
     let id = [];
-    if(req.query.filter) {
+    if (req.query.filter || req.query.filter_kategori || req.query.filter_tipe) {
       const wherePengajuan = {};
-      if(!req.user.roles.includes('Administrator')) {
+      if (!req.user.roles.includes('Administrator')) {
         wherePengajuan.pengguna_id = req.user.id;
       }
-      wherePengajuan.OR = [
-        {
-          status_pengajuan: {
-            contains: req.query.filter !== undefined ? req.query.filter : "",
-          }
-        },
-      ]
+      wherePengajuan.status_pengajuan = req.query.filter !== undefined && req.query.filter !== "" ? req.query.filter : undefined;
+
       const filterResult = await this.prisma.pengajuanBuku.findMany({
         where: {
           ...wherePengajuan,
-         OR: [
-          {
-            status_pengajuan: req.query.filter !== undefined ? req.query.filter : "",
+          buku: {
+            kategori_buku_id: req.query.filter_kategori !== undefined && req.query.filter_kategori !== "" ? Number(req.query.filter_kategori) : undefined,
+            tipe_identifikasi: req.query.filter_tipe !== undefined && req.query.filter_tipe !== "" ? req.query.filter_tipe : undefined,
           }
-         ]
         }
       });
       filterResult.forEach(item => {
@@ -132,7 +126,7 @@ class PengajuanRepository {
       });
       where.id = {
         in: id,
-      }
+      };
     }
     const result = await this.prisma.book.findMany({
       include: {

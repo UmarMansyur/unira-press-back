@@ -47,24 +47,41 @@ class Buku {
   }
 
   setDilihat(dilihat) {
-    this.dilihat = dilihat;
+    this.dilihat = Number(dilihat);
     return this;
   }
 
-  setLayouter(layouter_id) {
-    this.layouter_id = Number(layouter_id);
+  setLayouter(layouter) {
+    this.layouter = layouter;
     return this;
   }
 
-  setProofreader(proofreader_id) {
-    this.proofreader_id = Number(proofreader_id);
+  setProofreader(proofreader) {
+    this.proofreader = proofreader;
     return this;
   }
 
-  setEditor(editor_id) {
-    this.editor_id = editor_id;
+  setEditor(editor) {
+    this.editor = editor;
     return this;
   }
+
+  setDesainer(desainier) {
+    this.desainier = desainier;
+    return this;
+  }
+
+  setNomorPenanggungJawab(nomor_hp_penanggung_jawab) {
+    this.nomor_hp_penanggung_jawab = nomor_hp_penanggung_jawab;
+    return this;
+  }
+
+  setSuratPernyataan(surat_pernyataan) {
+    this.surat_pernyataan = surat_pernyataan;
+    return this;
+  }
+  
+
 }
 
 module.exports = Buku;

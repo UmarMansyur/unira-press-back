@@ -86,39 +86,42 @@ model BookCategory {
 }
 
 model Book {
-  id                Int                @id @default(autoincrement())
-  kategori_buku     BookCategory       @relation(fields: [kategori_buku_id], references: [id], onDelete: Cascade)
-  kategori_buku_id  Int
-  layouter          String?            @db.VarChar(200)
-  proofreader       String?            @db.VarChar(200)
-  editor            String?            @db.VarChar(200)
-  desainier         String?            @db.VarChar(200)
-  pengarang         String             @db.VarChar(200)
-  judul             String             @db.VarChar(200)
-  sinopsis          String             @db.Text
-  file_cover        String?            @db.VarChar(200)
-  tipe_identifikasi IdentificationType
-  isbn              String?            @unique @db.VarChar(200)
-  jumlah_halaman    Int?
-  ukuran            String             @db.VarChar(200)
-  tanggal_pengajuan DateTime           @default(now())
-  tanggal_publish   DateTime?
-  harga             Int?
-  tipe_kepenulisan  TypeWriting
-  penanggung_jawab  String?            @db.VarChar(200)
-  tahun_terbit      Int?
-  dilihat           Int                @default(0)
-  PengajuanISBN     PengajuanISBN[]
-  PengajuanBuku     PengajuanBuku[]
-  FileNaskah        FileNaskah[]
-  Invoice           Invoice[]
+  id                        Int                @id @default(autoincrement())
+  kategori_buku             BookCategory       @relation(fields: [kategori_buku_id], references: [id], onDelete: Cascade)
+  kategori_buku_id          Int
+  layouter                  String?            @db.VarChar(200)
+  proofreader               String?            @db.VarChar(200)
+  editor                    String?            @db.VarChar(200)
+  desainer                  String?            @db.VarChar(200)
+  pengarang                 String             @db.VarChar(200)
+  judul                     String             @db.VarChar(200)
+  sinopsis                  String             @db.Text
+  file_cover                String?            @db.VarChar(200)
+  tipe_identifikasi         IdentificationType
+  isbn                      String?            @unique @db.VarChar(200)
+  jumlah_halaman            Int?
+  ukuran                    String?             @db.VarChar(200)
+  tanggal_pengajuan         DateTime           @default(now())
+  tanggal_publish           DateTime?
+  harga                     Int?
+  tipe_kepenulisan          TypeWriting
+  penanggung_jawab          String?            @db.VarChar(200)
+  nomor_hp_penanggung_jawab String?            @db.VarChar(19)
+  tahun_terbit              Int?
+  dilihat                   Int                @default(0)
+  surat_pernyataan          String?            @db.VarChar(200)
+  PengajuanISBN             PengajuanISBN[]
+  PengajuanBuku             PengajuanBuku[]
+  FileNaskah                FileNaskah[]
+  Invoice                   Invoice[]
 
   @@map("buku")
 }
 
 enum TypeWriting {
-  fiksi
-  non_fiksi
+  naskah_pribadi
+  lebih_dari_satu
+  naskah_umum
 }
 
 enum IdentificationType {

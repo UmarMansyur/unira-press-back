@@ -14,6 +14,18 @@ class PengajuanBuku {
   async pengajuan(req) {
     const buku = new Buku();
     buku.setJudul(req.judul).setKategoriBuku(req.body.kategori_buku_id).setPengarang(req.body.perangarang).setSinopsis(req.body.sinopsis).setTipeIdentifikasi(req.body.tipe_identifikasi).setJumlahHalaman(req.body.jumlah_halaman).setUkuran(req.body.ukuran).setTipeKepenulisan(req.body.tipe_kepenulisan);
+    if (req.body.editor) {
+      buku.setEditor(req.body.editor);
+    }
+    if (req.body.layouter) {
+      buku.setLayouter(req.body.layouter);
+    }
+    if (req.body.proofreader) {
+      buku.setProofreader(req.body.proofreader);
+    }
+    if (req.body.desainer) {
+      buku.setDesainer(req.body.desainer);
+    }
     if (req.body.penanggung_jawab) {
       buku.setPenanggungJawab(req.body.penanggung_jawab);
     }
@@ -35,6 +47,7 @@ class PengajuanBuku {
     const result = await this.pengajuanRepository.updatePengajuanBuku(id, req.body);
     return result;
   }
+
 
   async deletePengajuanBuku(id) {
     const exist = await this.pengajuanRepository.getPengajuanBuku(id);

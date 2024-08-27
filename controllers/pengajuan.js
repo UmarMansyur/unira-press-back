@@ -8,16 +8,26 @@ class Pengajuan {
 
   async createPengajuan(req, res, next) {
     try {
-      const response = await this.pengajuan.pengajuan(req.body);
+      const response = await this.pengajuan.pengajuan(req);
       return responseSuccess(res, response, 'Pengajuan berhasil ditambahkan', 201);
     } catch (error) {
       next(error);
     }
   }
 
+  async findAll(req, res, next) {
+    try {
+      const response = await this.pengajuan.findAll(req);
+      return responseSuccess(res, response, 'Pengajuan berhasil diambil');
+    }
+    catch (error) {
+      next(error);
+    }
+  }
+
   async updatePengajuanBuku(req, res, next) {
     try {
-      const response = await this.pengajuan.updatePengajuanBuku(req.params.id, req.body);
+      const response = await this.pengajuan.updatePengajuanBuku(req.params.id, req);
       return responseSuccess(res, response, 'Pengajuan berhasil diupdate');
     } catch (error) {
       next(error);
@@ -35,7 +45,7 @@ class Pengajuan {
 
   async updateBuku(req, res, next) {
     try {
-      const response = await this.pengajuan.updateBuku(req.params.id, req.body);
+      const response = await this.pengajuan.updateBuku(req.params.id, req);
       return responseSuccess(res, response, 'Buku berhasil diupdate');
     } catch (error) {
       next(error);
@@ -80,7 +90,7 @@ class Pengajuan {
 
   async updatePengajuanISBN(req, res, next) {
     try {
-      const response = await this.pengajuan.updatePengajuanISBN(req.params.id, req.body);
+      const response = await this.pengajuan.updatePengajuanISBN(req.params.id, req);
       return responseSuccess(res, response, 'Pengajuan berhasil diupdate');
     } catch (error) {
       next(error);
@@ -89,7 +99,7 @@ class Pengajuan {
 
   async tolakPengajuanBuku(req, res, next) {
     try {
-      const response = await this.pengajuan.tolakPengajuanBuku(req.params.id, req.body);
+      const response = await this.pengajuan.tolakPengajuanBuku(req.params.id, req);
       return responseSuccess(res, response, 'Pengajuan berhasil ditolak');
     } catch (error) {
       next(error);
@@ -107,7 +117,7 @@ class Pengajuan {
 
   async createRevisi(req, res, next) {
     try {
-      const response = await this.pengajuan.createRevisi(req.body);
+      const response = await this.pengajuan.createRevisi(req);
       return responseSuccess(res, response, 'Revisi berhasil ditambahkan', 201);
     } catch (error) {
       next(error);
@@ -116,7 +126,7 @@ class Pengajuan {
 
   async updateRevisi(req, res, next) {
     try {
-      const response = await this.pengajuan.updateRevisi(req.params.id, req.body);
+      const response = await this.pengajuan.updateRevisi(req.params.id, req);
       return responseSuccess(res, response, 'Revisi berhasil diupdate');
     } catch (error) {
       next(error);
@@ -143,7 +153,7 @@ class Pengajuan {
 
   async createInvoice(req, res, next) {
     try {
-      const response = await this.pengajuan.createInvoice(req.body);
+      const response = await this.pengajuan.createInvoice(req);
       return responseSuccess(res, response, 'Invoice berhasil dibuat', 201);
     } catch (error) {
       next(error);
@@ -152,7 +162,7 @@ class Pengajuan {
 
   async updateInvoice(req, res, next) {
     try {
-      const response = await this.pengajuan.updateInvoice(req.params.id, req.body);
+      const response = await this.pengajuan.updateInvoice(req.params.id, req);
       return responseSuccess(res, response, 'Invoice berhasil diupdate');
     } catch (error) {
       next(error);

@@ -11,9 +11,17 @@ class PengajuanBuku {
     this.pengajuanRepository = new PengajuanRepository();
   }
 
+  async findAll(req) {
+    const result = await this.pengajuanRepository.findAll(req);
+    return result;
+  }
+
   async pengajuan(req) {
     const buku = new Buku();
-    buku.setJudul(req.judul).setKategoriBuku(req.body.kategori_buku_id).setPengarang(req.body.perangarang).setSinopsis(req.body.sinopsis).setTipeIdentifikasi(req.body.tipe_identifikasi).setJumlahHalaman(req.body.jumlah_halaman).setUkuran(req.body.ukuran).setTipeKepenulisan(req.body.tipe_kepenulisan);
+    buku.setJudul(req.body.judul).setKategoriBuku(req.body.kategori_buku_id).setPengarang(req.body.pengarang).setSinopsis(req.body.sinopsis).setTipeIdentifikasi(req.body.tipe_identifikasi).setJumlahHalaman(req.body.jumlah_halaman).setUkuran(req.body.ukuran).setTipeKepenulisan(req.body.tipe_kepenulisan);
+    if (req.body.harga) {
+      buku.setHarga(req.body.harga);
+    }
     if (req.body.editor) {
       buku.setEditor(req.body.editor);
     }
@@ -29,6 +37,22 @@ class PengajuanBuku {
     if (req.body.penanggung_jawab) {
       buku.setPenanggungJawab(req.body.penanggung_jawab);
     }
+    if(req.body.nomor_penanggung_jawab) {
+      buku.setNomorPenanggungJawab(req.body.nomor_penanggung_jawab);
+    }
+
+    const files = req.files;
+
+    if (files && files.naskah && files.naskah.length > 0) {
+      buku.setNaskah(files.naskah[0].path);
+    }
+    if (files && files.cover && files.cover.length > 0) {
+      buku.setCover(files.cover[0].path);
+    }
+    if (files && files.surat && files.surat.length > 0) {
+      buku.setSurat(files.surat[0].path);
+    }
+
     const pengajuan = new Pengajuan();
     const user = req.user;
     pengajuan.setBuku(buku).setPengguna(user.id);
@@ -73,9 +97,15 @@ class PengajuanBuku {
     if (!exist) {
       return ErrorHandler.notFound('Buku tidak ditemukan');
     }
+    if(exist.file_cover) {
+      await this.deleteFile(exist.file_cover);
+    }
+    if(exist.surat_pernyataan) {
+      await this.deleteFile(exist.surat_pernyataan);
+    }
     await Promise.all(
       exist.FileNaskah.map(async (file) => {
-        await this.deleteFileNaskah(file.file_naskah);
+        await this.deleteFile(file.file_naskah);
       })
     );
     const result = await this.pengajuanRepository.deleteBuku(id);
@@ -88,7 +118,7 @@ class PengajuanBuku {
     return result;
   }
 
-  async deleteFileNaskah(filePath) {
+  async deleteFile(filePath) {
     if (fs.existsSync(path.join(__dirname, '../', filePath))) {
       fs.unlinkSync(path.join(__dirname, '../', filePath));
     }
@@ -106,6 +136,7 @@ class PengajuanBuku {
     if (naskah.file_naskah) {
       this.deleteFileNaskah(naskah.file_naskah);
     }
+
     const result = await this.pengajuanRepository.updateUploadFileNaskah(id, file);
     return result;
   }

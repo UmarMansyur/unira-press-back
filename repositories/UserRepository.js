@@ -40,7 +40,7 @@ class UserRepository {
   findById(id) {
     return this.prisma.pengguna.findUnique({
       where: {
-        id,
+        id: Number(id),
       },
       include: {
         UserPrivillege: {

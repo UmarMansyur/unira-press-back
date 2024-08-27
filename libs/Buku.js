@@ -8,6 +8,7 @@ class Buku {
   setKategoriBuku(kategori) {
     const kategoriBuku = new KategoriBuku();
     kategoriBuku.setId(kategori);
+    this.kategori_buku = kategoriBuku;
     return this;
   }
 
@@ -27,7 +28,7 @@ class Buku {
   }
 
   setJumlahHalaman(jumlah_halaman) {
-    this.jumlah_halaman = jumlah_halaman;
+    this.jumlah_halaman = Number(jumlah_halaman);
     return this;
   }
 
@@ -66,8 +67,8 @@ class Buku {
     return this;
   }
 
-  setDesainer(desainier) {
-    this.desainier = desainier;
+  setDesainer(desainer) {
+    this.desainer = desainer;
     return this;
   }
 
@@ -78,6 +79,26 @@ class Buku {
 
   setSuratPernyataan(surat_pernyataan) {
     this.surat_pernyataan = surat_pernyataan;
+    return this;
+  }
+
+  setCover(cover) {
+    this.cover = cover;
+    return this;
+  }
+
+  setNaskah(naskah) {
+    this.naskah = naskah;
+    return this;
+  }
+
+  setSurat(surat) {
+    this.surat = surat;
+    return this;
+  }
+
+  setHarga(harga) {
+    this.harga = Number(harga);
     return this;
   }
   

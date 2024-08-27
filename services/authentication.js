@@ -17,6 +17,8 @@ class Authentication {
     if(!token) {
       return ErrorHandler.badRequest('Invalid token');
     }
+    delete token.iat;
+    delete token.exp;
     const newToken = generateToken(token);
     const newTokenRefresh = refreshToken(token);
     return {
@@ -113,17 +115,15 @@ class Authentication {
 
   async loginSimat(req) {
     const { username, password } = req.body;
-    console.log(username, password);
     const user = await this.fetchSimat(username, password);
     const roles = [];
     const existUser = await this.user.findByUsername(username);
-    console.log(existUser);
     if(existUser && existUser.UserPrivillege) {
       existUser.UserPrivillege.forEach(role => {
         roles.push(role.role.name);
       });
     }
-
+    let payload = {};
     if (existUser) {
       await this.user.update(existUser.id, {
         email: user.email,
@@ -134,6 +134,10 @@ class Authentication {
         has_verified_email: user.has_verified_email,
         thumbnail: user.thumbnail,
       });
+      payload = {
+        id: existUser.id,
+        roles: roles,
+      }
     } else {
       user.password = password;
       user.generatePassword = bcrypt.hashSync(password, 10);
@@ -148,13 +152,13 @@ class Authentication {
         },
       });
       roles.push('Pengguna');
-      user.id = result.id;
+      payload = {
+        id: result.id,
+        roles: roles,
+      }
     }
     
-    const payload = {
-      id: user.id,
-      roles: roles,
-    }
+
     return {
       access: generateToken(payload),
       refresh: refreshToken(payload),

@@ -121,13 +121,14 @@ model Book {
 enum TypeWriting {
   naskah_pribadi
   lebih_dari_satu
-  naskah_umum
+  naskah_komunitas
 }
 
 enum IdentificationType {
   ISBN
   QRCBN
   hanya_cetak
+  hanya_publish
 }
 
 model PengajuanISBN {

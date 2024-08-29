@@ -9,6 +9,7 @@ async function main() {
       { name: 'Desainer' },
       { name: 'Layouter' },
       { name: 'Editor' },
+      { name: 'Proofreader' },
     ]
   });
 

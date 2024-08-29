@@ -67,25 +67,27 @@ CREATE TABLE `kategori_buku` (
 CREATE TABLE `buku` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `kategori_buku_id` INTEGER NOT NULL,
-    `layouter_id` INTEGER NULL,
-    `proofreader_id` INTEGER NULL,
-    `editor_id` INTEGER NULL,
-    `desainer_id` INTEGER NULL,
+    `layouter` VARCHAR(200) NULL,
+    `proofreader` VARCHAR(200) NULL,
+    `editor` VARCHAR(200) NULL,
+    `desainer` VARCHAR(200) NULL,
     `pengarang` VARCHAR(200) NOT NULL,
     `judul` VARCHAR(200) NOT NULL,
     `sinopsis` TEXT NOT NULL,
     `file_cover` VARCHAR(200) NULL,
-    `tipe_identifikasi` ENUM('ISBN', 'QRCBN', 'hanya_cetak') NOT NULL,
+    `tipe_identifikasi` ENUM('ISBN', 'QRCBN', 'hanya_cetak', 'hanya_publish') NOT NULL,
     `isbn` VARCHAR(200) NULL,
-    `jumlah_halaman` INTEGER NOT NULL,
-    `ukuran` VARCHAR(200) NOT NULL,
+    `jumlah_halaman` INTEGER NULL,
+    `ukuran` VARCHAR(200) NULL,
     `tanggal_pengajuan` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `tanggal_publish` DATETIME(3) NULL,
     `harga` INTEGER NULL,
-    `tipe_kepenulisan` ENUM('fiksi', 'non_fiksi') NOT NULL,
+    `tipe_kepenulisan` ENUM('naskah_pribadi', 'lebih_dari_satu', 'naskah_komunitas') NOT NULL,
     `penanggung_jawab` VARCHAR(200) NULL,
+    `nomor_hp_penanggung_jawab` VARCHAR(19) NULL,
     `tahun_terbit` INTEGER NULL,
     `dilihat` INTEGER NOT NULL DEFAULT 0,
+    `surat_pernyataan` VARCHAR(200) NULL,
 
     UNIQUE INDEX `buku_isbn_key`(`isbn`),
     PRIMARY KEY (`id`)
@@ -96,6 +98,7 @@ CREATE TABLE `pengajuan_isbn` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `buku_id` INTEGER NOT NULL,
     `status` ENUM('proses', 'permohonan_revisi', 'ditolak', 'isbn_diterbitkan') NOT NULL DEFAULT 'proses',
+    `alasan_penolakan` TEXT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -132,6 +135,7 @@ CREATE TABLE `revisi_naskah` (
     `pengajuan_buku_id` INTEGER NOT NULL,
     `pengguna_id` INTEGER NOT NULL,
     `is_editor` BOOLEAN NOT NULL DEFAULT false,
+    `komentar` TEXT NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -144,7 +148,7 @@ CREATE TABLE `invoice` (
     `total_pembayaran` DOUBLE NOT NULL DEFAULT 0,
     `keterangan` TEXT NOT NULL,
     `status` ENUM('belum_dibayar', 'sudah_dibayar', 'gagal') NOT NULL DEFAULT 'belum_dibayar',
-    `tanggal_bayar` DATETIME(3) NOT NULL,
+    `tanggal_bayar` DATETIME(3) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -160,18 +164,6 @@ ALTER TABLE `berita` ADD CONSTRAINT `berita_penulis_id_fkey` FOREIGN KEY (`penul
 
 -- AddForeignKey
 ALTER TABLE `buku` ADD CONSTRAINT `buku_kategori_buku_id_fkey` FOREIGN KEY (`kategori_buku_id`) REFERENCES `kategori_buku`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `buku` ADD CONSTRAINT `buku_layouter_id_fkey` FOREIGN KEY (`layouter_id`) REFERENCES `pengguna`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `buku` ADD CONSTRAINT `buku_proofreader_id_fkey` FOREIGN KEY (`proofreader_id`) REFERENCES `pengguna`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `buku` ADD CONSTRAINT `buku_editor_id_fkey` FOREIGN KEY (`editor_id`) REFERENCES `pengguna`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `buku` ADD CONSTRAINT `buku_desainer_id_fkey` FOREIGN KEY (`desainer_id`) REFERENCES `pengguna`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `pengajuan_isbn` ADD CONSTRAINT `pengajuan_isbn_buku_id_fkey` FOREIGN KEY (`buku_id`) REFERENCES `buku`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

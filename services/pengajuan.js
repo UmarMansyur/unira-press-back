@@ -5,6 +5,7 @@ const PengajuanRepository = require("../repositories/PengajuanRepository");
 const path = require('path');
 const fs = require('fs');
 const ErrorHandler = require("../utils/error");
+const prisma = require("../utils/client");
 
 class PengajuanBuku {
   constructor() {
@@ -13,6 +14,16 @@ class PengajuanBuku {
 
   async findAll(req) {
     const result = await this.pengajuanRepository.findAll(req);
+    return result;
+  }
+
+  async pengajuanKu(req) {
+    const result = await this.pengajuanRepository.pengajuanKu(req);
+    return result;
+  }
+
+  async pengajuanEditor(req) {
+    const result = await this.pengajuanRepository.pengajuanEditor(req);
     return result;
   }
 
@@ -37,8 +48,8 @@ class PengajuanBuku {
     if (req.body.penanggung_jawab) {
       buku.setPenanggungJawab(req.body.penanggung_jawab);
     }
-    if(req.body.nomor_penanggung_jawab) {
-      buku.setNomorPenanggungJawab(req.body.nomor_penanggung_jawab);
+    if(req.body.nomor_hp_penanggung_jawab) {
+      buku.setNomorPenanggungJawab(req.body.nomor_hp_penanggung_jawab);
     }
 
     const files = req.files;
@@ -72,6 +83,31 @@ class PengajuanBuku {
     return result;
   }
 
+  async getBuku(id) {
+    const result = await this.pengajuanRepository.getBuku(id);
+    const userPrivillege = await prisma.userPrivillege.findMany({
+      where: {
+        role_id: {
+          in: [3, 4, 5, 6]
+        }
+      }
+    });
+    const pengguna = await prisma.pengguna.findMany({
+      include: {
+        UserPrivillege: true
+      },
+      where: {
+        id: {
+          in: userPrivillege.map(u => u.user_id)
+        }
+      }
+    });
+    result.editor_person = pengguna.filter(p => p.UserPrivillege.filter(u => u.role_id === 5));
+    result.layouter_person = pengguna.filter(p => p.UserPrivillege.filter(u => u.role_id === 4));
+    result.proofreader_person = pengguna.filter(p => p.UserPrivillege.filter(u => u.role_id === 6));
+    result.desainer_person = pengguna.filter(p => p.UserPrivillege.filter(u => u.role_id === 3));
+    return result;
+  }
 
   async deletePengajuanBuku(id) {
     const exist = await this.pengajuanRepository.getPengajuanBuku(id);
@@ -88,6 +124,31 @@ class PengajuanBuku {
   }
 
   async updateBuku(id, req) {
+    const exist = await this.pengajuanRepository.getBuku(id);
+    if (!exist) {
+      return ErrorHandler.notFound('Buku tidak ditemukan');
+    }
+    if (req.files && req.files.naskah && req.files.naskah.length > 0) {
+      if (exist.FileNaskah.length > 0) {
+        await Promise.all(
+          exist.FileNaskah.map(async (file) => {
+            await this.deleteFile(file.file_naskah);
+          })
+        );
+      }
+    }
+    if (req.files && req.files.cover && req.files.cover.length > 0) {
+      if (exist.file_cover) {
+        this.deleteFile(exist.file_cover);
+      }
+      req.body.file_cover = req.files.cover[0].path;
+    }
+    if (req.files && req.files.surat && req.files.surat.length > 0) {
+      if (exist.surat_pernyataan) {
+        this.deleteFile(exist.surat_pernyataan);
+      }
+      req.body.surat_pernyataan = req.files.surat[0].path;
+    }
     const result = await this.pengajuanRepository.updateBuku(id, req.body);
     return result;
   }
@@ -114,7 +175,7 @@ class PengajuanBuku {
 
   async fileNaskah(req) {
     const file = req.file;
-    const result = await this.pengajuanRepository.uploadFileNaskah(file);
+    const result = await this.pengajuanRepository.uploadFileNaskah(req.body.buku_id, file.path, req.body.keterangan);
     return result;
   }
 
@@ -141,17 +202,17 @@ class PengajuanBuku {
     return result;
   }
 
-  async deleteFileNaskah(id) {
-    const naskah = await this.pengajuanRepository.getFileNaskah(id);
+  async deleteFileNaskah(req) {
+    const naskah = await this.pengajuanRepository.getFileNaskah(req.params.id);
 
     if (!naskah) {
       return ErrorHandler.notFound('File naskah tidak ditemukan');
     }
 
     if (naskah.file_naskah) {
-      this.deleteFileNaskah(naskah.file_naskah);
+      this.deleteFile(naskah.file_naskah);
     }
-    const result = await this.pengajuanRepository.deleteFileNaskah(id);
+    const result = await this.pengajuanRepository.deleteFileNaskah(naskah.id);
     return result;
   }
 
@@ -181,6 +242,9 @@ class PengajuanBuku {
     const exist = await this.pengajuanRepository.getBuku(req.body.buku_id);
     if (!exist) {
       return ErrorHandler.notFound('Buku tidak ditemukan');
+    }
+    if(exist.file_cover) {
+      await this.deleteFile(exist.file_cover);
     }
     const result = await this.pengajuanRepository.uploadFileCover(req.body.buku_id, file);
     return result;
@@ -223,7 +287,7 @@ class PengajuanBuku {
     if (!exist) {
       return ErrorHandler.notFound('Buku tidak ditemukan');
     }
-    const result = await this.pengajuanRepository.createInvoice(req.body.buku_id, req.body);
+    const result = await this.pengajuanRepository.createInvoice(req.body);
     return result;
   }
 

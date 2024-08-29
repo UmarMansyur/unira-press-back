@@ -15,12 +15,39 @@ class Pengajuan {
     }
   }
 
+  async getBuku(req, res, next) {
+    try {
+      const response = await this.pengajuan.getBuku(req.params.id);
+      return responseSuccess(res, response, 'Buku berhasil diambil');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async findAll(req, res, next) {
     try {
       const response = await this.pengajuan.findAll(req);
       return responseSuccess(res, response, 'Pengajuan berhasil diambil');
     }
     catch (error) {
+      next(error);
+    }
+  }
+
+  async pengajuanKu(req, res, next) {
+    try {
+      const response = await this.pengajuan.pengajuanKu(req);
+      return responseSuccess(res, response, 'Pengajuan berhasil diambil');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async pengajuanEditor(req, res, next) {
+    try {
+      const response = await this.pengajuan.pengajuanEditor(req);
+      return responseSuccess(res, response, 'Pengajuan berhasil diambil');
+    } catch (error) {
       next(error);
     }
   }
@@ -63,7 +90,7 @@ class Pengajuan {
 
   async createFileNaskah(req, res, next) {
     try {
-      const response = await this.pengajuan.fileNaskah(req.params.id, req.file);
+      const response = await this.pengajuan.fileNaskah(req);
       return responseSuccess(res, response, 'File naskah berhasil ditambahkan', 201);
     } catch (error) {
       next(error);
@@ -81,7 +108,7 @@ class Pengajuan {
 
   async deleteFileNaskah(req, res, next) {
     try {
-      const response = await this.pengajuan.deleteFileNaskah(req.params.id);
+      const response = await this.pengajuan.deleteFileNaskah(req);
       return responseSuccess(res, response, 'File naskah berhasil dihapus');
     } catch (error) {
       next(error);

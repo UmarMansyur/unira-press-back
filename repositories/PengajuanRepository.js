@@ -1,9 +1,107 @@
-const { IdentificationType, TypeWriting } = require("@prisma/client");
 const prisma = require("../utils/client");
 
 class PengajuanRepository {
   constructor() {
     this.prisma = prisma;
+  }
+
+  async pengajuanEditor(req) {
+    const { editor, layouter, proofreader, desainer } = req.query;
+    const limit = req.query.limit || 10;
+    const page = req.query.page || 1;
+    const offset = (page - 1) * limit;
+    let where = {};
+    if (req.query.search) {
+      where.OR = [
+        {
+          judul: {
+            contains: req.query.search !== undefined ? req.query.search : "",
+          },
+        },
+        {
+          kategori_buku: {
+            name: {
+              contains: req.query.search !== undefined ? req.query.search : "",
+            }
+          }
+        },
+        {
+          pengarang: {
+            contains: req.query.search !== undefined ? req.query.search : "",
+          }
+        },
+        {
+          kategori_buku: {
+            name: {
+              contains: req.query.search !== undefined ? req.query.search : "",
+            }
+          }
+        }
+      ];
+    }
+    let id = [];
+    if (req.query.filter || req.query.filter_kategori || req.query.filter_tipe) {
+      const wherePengajuan = {};
+      if (!req.user.roles.includes('Administrator')) {
+        wherePengajuan.pengguna_id = req.user.id;
+      }
+      wherePengajuan.status_pengajuan = req.query.filter !== undefined && req.query.filter !== "" ? req.query.filter : undefined;
+
+      const filterResult = await this.prisma.pengajuanBuku.findMany({
+        where: {
+          ...wherePengajuan,
+          buku: {
+            kategori_buku_id: req.query.filter_kategori !== undefined && req.query.filter_kategori !== "" ? Number(req.query.filter_kategori) : undefined,
+            tipe_identifikasi: req.query.filter_tipe !== undefined && req.query.filter_tipe !== "" ? req.query.filter_tipe : undefined,
+          }
+        }
+      });
+      filterResult.forEach(item => {
+        id.push(item.buku_id);
+      });
+      where.id = {
+        in: id,
+      };
+    }
+    const result = await this.prisma.book.findMany({
+      include: {
+        PengajuanBuku: true,
+        PengajuanISBN: true,
+        kategori_buku: true,
+      },
+      where: {
+        ...where,
+        editor: editor !== undefined || editor !== "" ? (editor) : undefined,
+        layouter: layouter !== undefined || layouter !== "" ? (layouter) : undefined,
+        proofreader: proofreader !== undefined || proofreader !== "" ? (proofreader) : undefined,
+        desainer: desainer !== undefined || desainer !== "" ? (desainer) : undefined,
+      },
+      skip: Number(offset),
+      take: Number(limit),
+    });
+
+    const total = await this.prisma.book.count({
+      where: {
+        ...where,
+        editor: editor !== undefined || editor !== "" ? editor : undefined,
+        layouter: layouter !== undefined || layouter !== "" ? layouter : undefined,
+        proofreader: proofreader !== undefined || proofreader !== "" ? proofreader : undefined,
+        desainer: desainer !== undefined || desainer !== "" ? desainer : undefined,
+      }
+    });
+
+    return {
+      data: result.map((item) => {
+        return {
+          ...item,
+          file_cover: item.file_cover ? `${process.env.BASE_URL}/${item.file_cover}` : null,
+        };
+      }),
+      total,
+      current_page: Number(page),
+      total_page: Math.ceil(total / limit),
+      limit: Number(limit),
+    };
   }
 
   async pengajuan(pengajuan) {
@@ -54,6 +152,7 @@ class PengajuanRepository {
       data.FileNaskah = {
         create: {
           file_naskah: pengajuan.buku.naskah,
+          keterangan: "Naskah Buku"
         }
       };
     }
@@ -128,6 +227,13 @@ class PengajuanRepository {
         in: id,
       };
     }
+    if(!req.user.roles.includes('Administrator')) {
+      where.PengajuanBuku = {
+        some: {
+          pengguna_id: req.user.id,
+        }
+      };
+    }
     const result = await this.prisma.book.findMany({
       include: {
         PengajuanBuku: true,
@@ -157,6 +263,105 @@ class PengajuanRepository {
     };
   }
 
+  async pengajuanKu(req) {
+    const limit = req.query.limit || 10;
+    const page = req.query.page || 1;
+    const offset = (page - 1) * limit;
+    let where = {};
+    if (req.query.search) {
+      where.OR = [
+        {
+          judul: {
+            contains: req.query.search !== undefined ? req.query.search : "",
+          },
+        },
+        {
+          kategori_buku: {
+            name: {
+              contains: req.query.search !== undefined ? req.query.search : "",
+            }
+          }
+        },
+        {
+          pengarang: {
+            contains: req.query.search !== undefined ? req.query.search : "",
+          }
+        },
+        {
+          kategori_buku: {
+            name: {
+              contains: req.query.search !== undefined ? req.query.search : "",
+            }
+          }
+        }
+      ];
+    }
+    let id = [];
+    if (req.query.filter || req.query.filter_kategori || req.query.filter_tipe) {
+      const wherePengajuan = {};
+      if (!req.user.roles.includes('Administrator')) {
+        wherePengajuan.pengguna_id = req.user.id;
+      }
+      wherePengajuan.status_pengajuan = req.query.filter !== undefined && req.query.filter !== "" ? req.query.filter : undefined;
+
+      const filterResult = await this.prisma.pengajuanBuku.findMany({
+        where: {
+          ...wherePengajuan,
+          buku: {
+            kategori_buku_id: req.query.filter_kategori !== undefined && req.query.filter_kategori !== "" ? Number(req.query.filter_kategori) : undefined,
+            tipe_identifikasi: req.query.filter_tipe !== undefined && req.query.filter_tipe !== "" ? req.query.filter_tipe : undefined,
+          }
+        }
+      });
+      filterResult.forEach(item => {
+        id.push(item.buku_id);
+      });
+      where.id = {
+        in: id,
+      };
+    }
+    const result = await this.prisma.book.findMany({
+      include: {
+        PengajuanBuku: true,
+        PengajuanISBN: true,
+        kategori_buku: true,
+      },
+      where: {
+        ...where,
+        PengajuanBuku: {
+          some: {
+            pengguna_id: req.user.id,
+          }
+        }
+      },
+      skip: Number(offset),
+      take: Number(limit),
+    });
+
+    const total = await this.prisma.book.count({
+      where: {
+        ...where,
+        PengajuanBuku: {
+          some: {
+            pengguna_id: req.user.id,
+          }
+        }
+      }
+    });
+
+    return {
+      data: result.map((item) => {
+        return {
+          ...item,
+          file_cover: item.file_cover ? `${process.env.BASE_URL}/${item.file_cover}` : null,
+        };
+      }),
+      total,
+      current_page: Number(page),
+      total_page: Math.ceil(total / limit),
+      limit: Number(limit),
+    };
+  }
 
   async pengajuanISBN(pengajuan) {
     const data = {
@@ -229,27 +434,40 @@ class PengajuanRepository {
   }
 
   async updateBuku(id, data) {
-    console.log(data);
+    if(data.kategori_buku_id) {
+      data.kategori_buku_id = Number(data.kategori_buku_id);
+    }
     const result = await this.prisma.book.update({
       where: {
         id: Number(id),
       },
       data: {
-        ...data
+        ...data,
       }
     });
     return result;
   }
 
   async getBuku(id) {
-    return await this.prisma.book.findFirst({
+    const result = await this.prisma.book.findFirst({
       where: {
         id: Number(id),
       },
       include: {
-        FileNaskah: true
+        FileNaskah: true,
+        kategori_buku: true,
+        PengajuanBuku: {
+          include: {
+            RevisiNaskah: true,
+          }
+        },
+        PengajuanISBN: true,
+        Invoice: true,
       }
     });
+    result.file_cover = result.file_cover ? `${process.env.BASE_URL}/${result.file_cover}` : null;
+    result.surat_pernyataan = result.surat_pernyataan ? `${process.env.BASE_URL}/${result.surat_pernyataan}` : null;
+    return result;
   }
 
   async deleteBuku(id) {
@@ -322,11 +540,12 @@ class PengajuanRepository {
     return result;
   }
 
-  async uploadFileNaskah(buku_id, file) {
+  async uploadFileNaskah(buku_id, file, keterangan) {
     const result = await this.prisma.fileNaskah.create({
       data: {
         buku_id: Number(buku_id),
         file_naskah: file,
+        keterangan
       }
     });
     return result;
@@ -412,7 +631,7 @@ class PengajuanRepository {
         buku_id: Number(data.buku_id),
         total_pembayaran: data.total_pembayaran,
         keterangan: data.keterangan,
-        status: data.status
+        pengguna_id: Number(data.pengguna_id),
       }
     });
     return result;

@@ -38,13 +38,20 @@ class Authentication {
       return ErrorHandler.conflictError('User already exists');
     }
 
+    const existUsername = await this.user.findByUsername(user.username);
+    if (existUsername) {
+      return ErrorHandler.conflictError('Username already exists');
+    }
+
     const result = await this.user.create(user);
-    await this.prisma.userPrivillege.create({
-      data: {
-        user_id: result.id,
-        role_id: 2,
-      },
-    });
+    if(result) {
+      await this.prisma.userPrivillege.create({
+        data: {
+          user_id: result.id,
+          role_id: 2,
+        },
+      });
+    }
 
     const token = generateToken({ id: result.id });
 
@@ -219,6 +226,9 @@ class Authentication {
   async whoami(req) {
     const { id } = req.user;
     const user = await this.user.findById(id);
+    if(!user.thumbnail) {
+      user.thumbnail = "https://ik.imagekit.io/8zmr0xxik/blob_c2rRi4vdU?updatedAt=1709077347010"
+    }
     return user;
   }
 

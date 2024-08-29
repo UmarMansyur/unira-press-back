@@ -181,7 +181,8 @@ model FileNaskah {
   buku        Book   @relation(fields: [buku_id], references: [id], onDelete: Cascade)
   buku_id     Int
   file_naskah String @db.VarChar(200)
-
+  keterangan  String? @db.VarChar(200)
+  createdAt   DateTime @default(now())
   @@map("file_naskah")
 }
 

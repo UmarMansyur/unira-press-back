@@ -125,6 +125,8 @@ CREATE TABLE `file_naskah` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `buku_id` INTEGER NOT NULL,
     `file_naskah` VARCHAR(200) NOT NULL,
+    `keterangan` VARCHAR(200) NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -149,6 +151,16 @@ CREATE TABLE `invoice` (
     `keterangan` TEXT NOT NULL,
     `status` ENUM('belum_dibayar', 'sudah_dibayar', 'gagal') NOT NULL DEFAULT 'belum_dibayar',
     `tanggal_bayar` DATETIME(3) NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `tentang_kami` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `content` TEXT NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

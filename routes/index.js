@@ -17,4 +17,5 @@ router.use('/pengguna', pengguna);
 router.use('/pengajuan', pengajuan);
 router.use('/pengajuanku', pengajuanUser)
 router.use('/katalog', katalog);
+router.use('/about-me', require('./aboutme'));
 module.exports = router;

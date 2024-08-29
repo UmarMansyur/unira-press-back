@@ -45,6 +45,12 @@ async function main() {
       { name: 'Fiksi' },
     ]
   });
+
+  await prisma.aboutMe.create({
+    data: {
+      content: "<p>Ini adalah contoh isi about me</p>",
+    }
+  })
 }
 
 main()

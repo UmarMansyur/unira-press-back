@@ -217,3 +217,12 @@ enum StatusInvoice {
   sudah_dibayar
   gagal
 }
+
+model AboutMe {
+  id Int @id @default(autoincrement())
+  content String @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tentang_kami")
+}
